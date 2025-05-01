@@ -247,6 +247,7 @@ export function ApplicationForm() {
       termsAgreed: false,
     },
   });
+console.log(form, "form");
 
   // PDF Document Component with multi-page support
   const ApplicationPDF = ({ data, images }: any) => {
@@ -1239,6 +1240,7 @@ export function ApplicationForm() {
       ...form.getValues(),
     };
   }, [form, previewMode]);
+console.log(pdfData, "pdfData");
 
   // Prepare images for PDF
   const pdfImages = useMemo(() => {
