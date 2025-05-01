@@ -1528,7 +1528,7 @@ export function ApplicationForm() {
             <CardTitle className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 to-purple-600">
               <div className="flex justify-start items-center gap-2">
                 <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center">
-                  <img src="../../public/icon.png" alt="404" />
+                  <img src="/icon.png" alt="404" />
                 </div>
                 <span>APPLICATION FORM</span>
               </div>

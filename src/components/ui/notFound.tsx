@@ -15,10 +15,10 @@ export default function NotFound() {
           />
         </div>
 
-        <Card className="w-full p-8 shadow-sm">
+        <Card className="w-full p-8 shadow-sm bg-blue-900">
           <div className="text-center space-y-4">
-            <h1 className="text-3xl font-semibold text-gray-800">Oops!</h1>
-            <p className="text-lg text-gray-600">No Exam found.</p>
+            <h1 className="text-3xl font-semibold text-white-800">Oops!</h1>
+            <p className="text-lg text-white-600">No Exam found.</p>
           </div>
         </Card>
 

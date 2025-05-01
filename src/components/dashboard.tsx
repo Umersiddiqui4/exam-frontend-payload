@@ -890,7 +890,7 @@ export function Dashboard() {
           <div className="p-4 flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
-                <img src="../../public/icon.png" alt="404" />
+                <img src="/icon.png" alt="404" />
               </div>
               <span className="font-bold text-lg">MRCGP INT. </span>
             </div>

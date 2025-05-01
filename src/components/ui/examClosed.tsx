@@ -11,7 +11,7 @@ export default function ExamClosed() {
       <div className="w-full max-w-3xl mx-auto">
         <div className="flex justify-center mb-8">
           <img
-            src="../../public/logo.png"
+            src="/logo.png"
             alt="MRCGP[INT] South Asia Logo"
             width={220}
             height={120}
@@ -19,10 +19,10 @@ export default function ExamClosed() {
           />
         </div>
 
-        <Card className="w-full p-8 shadow-sm">
-          <div className="text-center space-y-4">
-            <h1 className="text-3xl font-semibold text-gray-800">Note!</h1>
-            <p className="text-lg text-gray-600">
+        <Card className="w-full p-8 shadow-sm bg-blue-900">
+          <div className="text-center space-y-4 ">
+            <h1 className="text-3xl font-semibold text-white-800">Note!</h1>
+            <p className="text-lg text-white-600">
               Exam form submission date has expired. Please wait for the next
               enrollment period.
             </p>
