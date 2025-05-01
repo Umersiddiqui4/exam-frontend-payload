@@ -7,7 +7,7 @@ export default function NotFound() {
       <div className="w-full max-w-3xl mx-auto">
         <div className="flex justify-center mb-8">
           <img
-            src="../../public/logo.png"
+            src="/logo.png"
             alt="MRCGP[INT] South Asia Logo"
             width={220}
             height={120}
