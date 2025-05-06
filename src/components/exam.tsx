@@ -20,6 +20,7 @@ import {
   updateExam,
 } from "@/redux/examDataSlice";
 import { useDispatch, useSelector } from "react-redux";
+import { format } from "date-fns";
 
 interface ExamData {
   id: string;
@@ -63,13 +64,12 @@ function DateRangePickerWithRange({
   useEffect(() => {
     const newFrom = value.from ? new Date(value.from) : undefined;
     const newTo = value.to ? new Date(value.to) : undefined;
-
+  
     const currentFromStr = date.from
-      ? date.from.toISOString().split("T")[0]
+      ? date.from.toLocaleDateString("en-CA")
       : "";
-    const currentToStr = date.to ? date.to.toISOString().split("T")[0] : "";
-
-    // Only update if the values are actually different
+    const currentToStr = date.to ? date.to.toLocaleDateString("en-CA") : "";
+  
     if (value.from !== currentFromStr || value.to !== currentToStr) {
       isUpdatingFromProps.current = true;
       setDate({
@@ -78,6 +78,7 @@ function DateRangePickerWithRange({
       });
     }
   }, [value.from, value.to]);
+  
 
   // Handle user interactions with the date picker
   const handleDateChange = (newDate: DateRange | undefined) => {
@@ -85,8 +86,8 @@ function DateRangePickerWithRange({
 
     if (newDate?.from || newDate?.to) {
       onChange({
-        from: newDate.from ? newDate.from.toISOString().split("T")[0] : "",
-        to: newDate.to ? newDate.to.toISOString().split("T")[0] : "",
+        from: newDate.from ? format(newDate.from, "yyyy-MM-dd") : "",
+        to: newDate.to ? format(newDate.to, "yyyy-MM-dd") : "",
       });
     }
   };
@@ -130,6 +131,8 @@ export function Exam() {
     field: string,
     value: { from: string; to: string }
   ) => {
+    console.log("Date Range Changed:", field, value);
+    
     setFormData({
       ...formData,
       [field]: value,

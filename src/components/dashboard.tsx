@@ -64,7 +64,6 @@ import {
 // Removed unused import
 import { format } from "date-fns";
 import { pdf } from "@react-pdf/renderer";
-import { saveAs } from "file-saver"; // Ensure you install types with: npm i --save-dev @types/file-saver
 
 export function Dashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -81,7 +80,7 @@ export function Dashboard() {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const initialExams = useSelector(selectExams);
   const applications = useSelector(selectApplications);
-  const [pdfGenerating, setPdfGenerating] = useState(false);
+  const [pdfGenerating] = useState(false);
 
   console.log(selectedExam, "examId");
 
@@ -97,13 +96,6 @@ export function Dashboard() {
       setSidebarOpen(true);
     }
   }, [isMobile]);
-  console.log(user, "user");
-
-  // const pdfData = useMemo(() => {
-  //   return {
-  //     .getValues(),
-  //   }
-  // }, [form, previewMode])
 
   useEffect(() => {
     // First filter by status
@@ -709,30 +701,24 @@ export function Dashboard() {
     setSelectedExam(value);
   };
 
-  // optional, for file download
+  const generatePdfBlob = async (data: any, images: any) => {
+    const doc = <ApplicationPDF data={data} images={images} />;
+    const asPdf = pdf();
+    asPdf.updateContainer(doc);
+    const blob = await asPdf.toBlob();
+    return blob;
+  };
 
   const handlePdfGenerate = async (row: any) => {
-    setPdfGenerating(true);
-    try {
-      const blob = await pdf(
-        <ApplicationPDF
-          data={row.original}
-          images={{
-            passport: row.original.passportUrl,
-            medicalLicense: row.original.medicalLicenseUrl,
-            part1Email: row.original.part1EmailUrl,
-            passportBio: row.original.passportBioUrl,
-            signature: row.original.signatureUrl,
-          }}
-        />
-      ).toBlob();
-
-      saveAs(blob, "MRCGP_Application_Form.pdf");
-    } catch (error) {
-      console.error("PDF generation error:", error);
-    } finally {
-      setPdfGenerating(false);
-    }
+    const blob = await generatePdfBlob(row.original, {
+      passport: row.original.passportUrl,
+      medicalLicense: row.original.medicalLicenseUrl,
+      part1Email: row.original.part1EmailUrl,
+      passportBio: row.original.passportBioUrl,
+      signature: row.original.signatureUrl,
+    });
+    const url = URL.createObjectURL(blob);
+    window.open(url, "_blank");
   };
 
   console.log(applications, "application");
@@ -804,7 +790,7 @@ export function Dashboard() {
         const examName =
           selectedExam !== "all"
             ? initialExams.find((exam) => exam.id.toString() === selectedExam)
-                ?.name || "Selected-Exam"
+              ?.name || "Selected-Exam"
             : "All-Exams";
 
         const url = URL.createObjectURL(blob);
@@ -883,9 +869,8 @@ export function Dashboard() {
       {/* Sidebar - transforms to top navbar on mobile */}
       {sidebarOpen && (
         <div
-          className={`${
-            isMobile ? "fixed top-0 left-0 z-50 w-64 h-full" : "w-64"
-          } bg-slate-800 text-slate-100 shadow-lg transition-all duration-300 dark:bg-slate-900`}
+          className={`${isMobile ? "fixed top-0 left-0 z-50 w-64 h-full" : "w-64"
+            } bg-slate-800 text-slate-100 shadow-lg transition-all duration-300 dark:bg-slate-900`}
         >
           <div className="p-4 flex items-center justify-between">
             <div className="flex items-center space-x-2">

@@ -41,9 +41,8 @@ export default function ExamComponent() {
       {/* Sidebar - transforms to top navbar on mobile */}
       {sidebarOpen && (
         <div
-          className={`${
-            isMobile ? "fixed top-0 left-0 z-50 w-64 h-full" : "w-64"
-          } bg-slate-800 text-slate-100 shadow-lg transition-all duration-300 dark:bg-slate-900`}
+          className={`${isMobile ? "fixed top-0 left-0 z-50 w-64 h-full" : "w-64"
+            } bg-slate-800 text-slate-100 shadow-lg transition-all duration-300 dark:bg-slate-900`}
         >
           <div className="p-4 flex items-center justify-between">
             <div className="flex items-center space-x-2">
