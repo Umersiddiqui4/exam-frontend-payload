@@ -74,7 +74,6 @@ export function Dashboard() {
   const { theme, setTheme } = useTheme();
   const navigate = useNavigate();
   const isMobile = useMobile();
-  const { user } = useSelector((state: any) => state.auth);
   const [open, setOpen] = useState(false);
   const dispatch = useDispatch();
   const [searchQuery, setSearchQuery] = useState<string>("");

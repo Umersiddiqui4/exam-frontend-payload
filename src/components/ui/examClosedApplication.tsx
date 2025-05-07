@@ -1,10 +1,10 @@
-"use client"
+"use client";
 
-import { Card } from "@/components/ui/card"
-import { useState } from "react"
+import { Card } from "@/components/ui/card";
+import { useState } from "react";
 
 export default function ExamClosedApp() {
-  const [activeTab] = useState("notification1")
+  const [activeTab] = useState("notification1");
 
   return (
     <div className="min-h-screen w-full bg-gray-50 flex flex-col items-center justify-center p-4">
@@ -19,27 +19,31 @@ export default function ExamClosedApp() {
           />
         </div>
 
-    
-
-            <Card className="w-full p-8 shadow-sm bg-blue-900">
-              <div className="text-center space-y-4 ">
-                <h1 className="text-3xl font-semibold text-white">Note!</h1>
-                <p className="text-lg text-white">Registration for the &apos;March-2025&apos; exam is now closed.</p>
-              </div>
-            </Card>
-
-            
+        <Card className="w-full p-8 shadow-sm bg-blue-900">
+          <div className="text-center space-y-4 ">
+            <h1 className="text-3xl font-semibold text-white">Note!</h1>
+            <p className="text-lg text-white">
+              Registration for the &apos;March-2025&apos; exam is now closed.
+            </p>
+          </div>
+        </Card>
 
         <div className="mt-8 text-center">
           <p className="text-sm text-gray-500">
-            Currently viewing: {activeTab === "notification1" ? "March-2025 Exam Closure" : "Submission Date Expiry"}
+            Currently viewing:{" "}
+            {activeTab === "notification1"
+              ? "March-2025 Exam Closure"
+              : "Submission Date Expiry"}
           </p>
         </div>
 
         <footer className="mt-8 text-center text-sm text-gray-500">
-          <p>© {new Date().getFullYear()} MRCGP[INT] South Asia. All rights reserved.</p>
+          <p>
+            © {new Date().getFullYear()} MRCGP[INT] South Asia. All rights
+            reserved.
+          </p>
         </footer>
       </div>
     </div>
-  )
+  );
 }

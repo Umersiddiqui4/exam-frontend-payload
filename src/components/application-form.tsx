@@ -41,11 +41,11 @@ import { useDispatch, useSelector } from "react-redux"
 import { incrementApplicationsCount, selectExams, toggleBlockExam } from "@/redux/examDataSlice"
 import { supabase } from "@/lib/supabaseClient"
 import { addApplication, selectApplications } from "@/redux/applicationsSlice"
-import ExamClosed from "./ui/examClosed"
-import ExamClosedApp from "./ui/examClosedApplication"
 import { PDFDownloadLink, Document, Page, Text, View, StyleSheet, Image } from "@react-pdf/renderer"
 import { useMemo } from "react"
 import NotFound from "./ui/notFound"
+import ExamClosedApp from "./ui/examClosedApplication"
+import ExamClosed from "./ui/examClosed"
 
 // Form schema
 const formSchema = z.object({
@@ -55,7 +55,7 @@ const formSchema = z.object({
     .regex(/^\d+$/, "Candidate ID must contain only numbers"),
   passportImage: z.any().optional(),
   fullName: z.string().min(2, "Full name is required"),
-
+ 
   // Address
   poBox: z.string().min(1, "P.O. Box is required"),
   district: z.string().min(1, "District is required"),
@@ -87,10 +87,10 @@ const formSchema = z.object({
   preferenceDate3: z.string().optional(),
 
   // Uploads
-  medicalLicense: z.any().optional(),
   part1PassingEmail: z.any().optional(),
-  passportBioPage: z.any().optional(),
-  signature: z.any().optional(),
+  medicalLicense: z.any(),
+  passportBioPage: z.any(),
+  signature: z.any(),
 
   // Agreement
   agreementName: z.string().min(2, "Full name is required"),
@@ -196,338 +196,7 @@ export function ApplicationForm() {
   console.log(form, "form")
 
   // PDF Document Component with multi-page support
-  const ApplicationPDF = ({ data, images }: any) => {
-    return (
-      <Document>
-        {/* Main application form page */}
-        <Page size="A4" style={styles.page}>
-          {/* Header */}
-          <View style={styles.header}>
-            <View style={styles.headerContent1}>
-              <Image src="/icon.png" style={styles.passportImage1} />
-              <div className="text-center">
-                <Text style={styles.title}>MRCGP [INT.] South Asia</Text>
-                <Text style={styles.subtitle}>Part 2 (OSCE) Examination Application</Text>
-              </div>
-            </View>
-            {images.passport && <Image src={images.passport || "/placeholder.svg"} style={styles.passportImage} />}
-          </View>
-
-          {/* Main content - Resume style format */}
-          <View style={styles.section}>
-            {/* Candidate information section */}
-            <View style={styles.resumeSection}>
-              <View style={styles.resumeHeader}>
-                <Text style={styles.resumeSectionTitle}>Exam Information</Text>
-              </View>
-              <View style={styles.resumeBody}>
-                <View style={styles.row}>
-                  <View style={styles.column}>
-                    <View style={styles.fieldRow}>
-                      <Text style={styles.fieldLabel}>sel</Text>
-                      <Text style={styles.fieldValue}>{data.candidateId || "Not provided"}</Text>
-                    </View>
-                    <View style={styles.fieldRow}>
-                      <Text style={styles.fieldLabel}>Full Name:</Text>
-                      <Text style={styles.fieldValue}>{data.fullName || "Not provided"}</Text>
-                    </View>
-                  </View>
-                </View>
-              </View>
-            </View>
-            <View style={styles.resumeSection}>
-              <View style={styles.resumeHeader}>
-                <Text style={styles.resumeSectionTitle}>CANDIDATE INFORMATION</Text>
-              </View>
-              <View style={styles.resumeBody}>
-                <View style={styles.row}>
-                  <View style={styles.column}>
-                    <View style={styles.fieldRow}>
-                      <Text style={styles.fieldLabel}>Candidate ID:</Text>
-                      <Text style={styles.fieldValue}>{data.candidateId || "Not provided"}</Text>
-                    </View>
-                    <View style={styles.fieldRow}>
-                      <Text style={styles.fieldLabel}>Full Name:</Text>
-                      <Text style={styles.fieldValue}>{data.fullName || "Not provided"}</Text>
-                    </View>
-                  </View>
-                </View>
-              </View>
-            </View>
-
-            {/* Contact information section */}
-            <View style={styles.resumeSection}>
-              <View style={styles.resumeHeader}>
-                <Text style={styles.resumeSectionTitle}>CONTACT INFORMATION</Text>
-              </View>
-              <View style={styles.resumeBody}>
-                <View style={styles.row}>
-                  <View style={styles.column}>
-                    <View style={styles.fieldRow}>
-                      <Text style={styles.fieldLabel}>WhatsApp:</Text>
-                      <Text style={styles.fieldValue}>{data.whatsapp || "Not provided"}</Text>
-                    </View>
-                    <View style={styles.fieldRow}>
-                      <Text style={styles.fieldLabel}>Emergency Contact:</Text>
-                      <Text style={styles.fieldValue}>{data.emergencyContact || "Not provided"}</Text>
-                    </View>
-                    <View style={styles.fieldRow}>
-                      <Text style={styles.fieldLabel}>Email:</Text>
-                      <Text style={styles.fieldValue}>{data.email || "Not provided"}</Text>
-                    </View>
-                  </View>
-                </View>
-              </View>
-            </View>
-
-            {/* Address section */}
-
-            <View style={styles.resumeSection}>
-              <View style={styles.resumeHeader}>
-                <Text style={styles.resumeSectionTitle}>CONTACT INFORMATION</Text>
-              </View>
-              <View style={styles.resumeBody}>
-                <View style={styles.row}>
-                  <View style={styles.column}>
-                    <View style={styles.fieldRow}>
-                      <Text style={styles.fieldLabel}>Post Box:</Text>
-                      <Text style={styles.fieldValue}>{data.poBox || "No address"}</Text>
-                    </View>
-                    <View style={styles.fieldRow}>
-                      <Text style={styles.fieldLabel}>District</Text>
-                      <Text style={styles.fieldValue}>{data.district || ""}</Text>
-                    </View>
-                    <View style={styles.fieldRow}>
-                      <Text style={styles.fieldLabel}>City:</Text>
-                      <Text style={styles.fieldValue}>{data.city || ""}</Text>
-                    </View>
-                    <View style={styles.fieldRow}>
-                      <Text style={styles.fieldLabel}>province:</Text>
-                      <Text style={styles.fieldValue}>{data.province || ""}</Text>
-                    </View>
-                    <View style={styles.fieldRow}>
-                      <Text style={styles.fieldLabel}>Country:</Text>
-                      <Text style={styles.fieldValue}>{data.country || ""}</Text>
-                    </View>
-                  </View>
-                </View>
-              </View>
-            </View>
-
-            {/* Experience section */}
-            <View style={styles.resumeSection}>
-              <View style={styles.resumeHeader}>
-                <Text style={styles.resumeSectionTitle}>EXPERIENCE</Text>
-              </View>
-              <View style={styles.resumeBody}>
-                <View style={styles.fieldRow}>
-                  <Text style={styles.fieldLabel}>Date of passing Part 1:</Text>
-                  <Text style={styles.fieldValue}>{data.dateOfPassingPart1 || "Not provided"}</Text>
-                </View>
-                <View style={styles.fieldRow}>
-                  <Text style={styles.fieldLabel}>Previous OSCE attempts:</Text>
-                  <Text style={styles.fieldValue}>{data.previousOsceAttempts || "Not provided"}</Text>
-                </View>
-                <View style={styles.fieldRow}>
-                  <Text style={styles.fieldLabel}>Country of experience:</Text>
-                  <Text style={styles.fieldValue}>{data.countryOfExperience || "Not provided"}</Text>
-                </View>
-                <View style={styles.fieldRow}>
-                  <Text style={styles.fieldLabel}>Country of origin:</Text>
-                  <Text style={styles.fieldValue}>{data.countryOfOrigin || "Not provided"}</Text>
-                </View>
-              </View>
-            </View>
-
-            {/* License details section */}
-            <View style={styles.resumeSection}>
-              <View style={styles.resumeHeader}>
-                <Text style={styles.resumeSectionTitle}>LICENSE DETAILS</Text>
-              </View>
-              <View style={styles.resumeBody}>
-                <View style={styles.fieldRow}>
-                  <Text style={styles.fieldLabel}>Registration authority:</Text>
-                  <Text style={styles.fieldValue}>{data.registrationAuthority || "Not provided"}</Text>
-                </View>
-                <View style={styles.fieldRow}>
-                  <Text style={styles.fieldLabel}>Registration number:</Text>
-                  <Text style={styles.fieldValue}>{data.registrationNumber || "Not provided"}</Text>
-                </View>
-                <View style={styles.fieldRow}>
-                  <Text style={styles.fieldLabel}>Date of registration:</Text>
-                  <Text style={styles.fieldValue}>
-                    {data.dateOfRegistration ? format(data.dateOfRegistration, "PPP") : "Not provided"}
-                  </Text>
-                </View>
-              </View>
-            </View>
-
-            {/* OSCE Session Preferences */}
-            <View style={styles.resumeSection}>
-              <View style={styles.resumeHeader}>
-                <Text style={styles.resumeSectionTitle}>OSCE SESSION PREFERENCES</Text>
-              </View>
-              <View style={styles.resumeBody}>
-                <View style={styles.fieldRow}>
-                  <Text style={styles.fieldLabel}>Preference Date 1:</Text>
-                  <Text style={styles.fieldValue}>
-                    {data.preferenceDate1 ? format(new Date(data.preferenceDate1), "PPP") : "Not provided"}
-                  </Text>
-                </View>
-                <View style={styles.fieldRow}>
-                  <Text style={styles.fieldLabel}>Preference Date 2:</Text>
-                  <Text style={styles.fieldValue}>
-                    {data.preferenceDate2 ? format(new Date(data.preferenceDate2), "PPP") : "Not provided"}
-                  </Text>
-                </View>
-                <View style={styles.fieldRow}>
-                  <Text style={styles.fieldLabel}>Preference Date 3:</Text>
-                  <Text style={styles.fieldValue}>
-                    {data.preferenceDate3 ? format(new Date(data.preferenceDate3), "PPP") : "Not provided"}
-                  </Text>
-                </View>
-              </View>
-            </View>
-
-            {/* Agreement */}
-            <View style={styles.resumeSection}>
-              <View style={styles.resumeHeader}>
-                <Text style={styles.resumeSectionTitle}>AGREEMENT</Text>
-              </View>
-              <View style={styles.resumeBody}>
-                <View style={styles.fieldRow}>
-                  <Text style={styles.fieldLabel}>Name:</Text>
-                  <Text style={styles.fieldValue}>{data.agreementName || "Not provided"}</Text>
-                </View>
-                <View style={styles.fieldRow}>
-                  <Text style={styles.fieldLabel}>Date:</Text>
-                  <Text style={styles.fieldValue}>
-                    {data.agreementDate ? format(data.agreementDate, "PPP") : "Not provided"}
-                  </Text>
-                </View>
-                <View style={styles.fieldRow}>
-                  <Text style={styles.fieldLabel}>Terms Agreed:</Text>
-                  <Text style={styles.fieldValue}>{data.termsAgreed ? "Yes" : "No"}</Text>
-                </View>
-              </View>
-            </View>
-            <View style={styles.resumeSection}>
-              <View style={styles.resumeHeader}>
-                <Text style={styles.resumeSectionTitle}>Please Note</Text>
-              </View>
-              <View style={styles.resumeBody}>
-                <View style={styles.fieldRow}>
-                  <Text style={styles.note}>
-                    THE NUMBER OF PLACES IS LIMITED, AND SLOTS WILL BE ALLOCATED ON THE "FIRST COME FIRST SERVED” BASIS.
-                    Your application may be rejected because of a large number of applicants and you may be invited to
-                    apply again or offered a slot at a subsequent examination. Priority will be given to applicants from
-                    South Asia and those applications that reach us first, so we encourage you to apply as soon as
-                    possible. WHILST WE WILL TRY TO ACCOMMODATE YOUR PREFERENCE, IT MAY NOT BE POSSIBLE DUE TO A LARGE
-                    NUMBER OF APPLICANTS. Please email us well in advance if you require a letter of invitation for visa
-                    purposes and make sure you complete all travel formalities in good time (visa applications, travel
-                    permits, leaves, etc.) No Refunds will be granted in case any candidate fails to get the visa prior
-                    to the exam date. Candidates with a disability are requested to read the rules and regulation
-                    document [Page 10] available on the website The MRCGP [INT.] South Asia Secretariat will notify you
-                    by email of your allocated date and time at least two weeks before the exam starting date.
-                  </Text>
-                </View>
-              </View>
-            </View>
-            <View style={styles.resumeSection}>
-              <View style={styles.resumeHeader}>
-                <Text style={styles.resumeSectionTitle}>CANDIDATE'S STATEMENT</Text>
-              </View>
-              <View style={styles.resumeBody}>
-                <View style={styles.fieldRow}>
-                  <Text style={styles.note}>
-                    I hereby apply to sit the South Asia MRCGP [INT.] Part 2 (OSCE) Examination, success in which will
-                    allow me to apply for International Membership of the UK's Royal College of General Practitioners.
-                    Detailed information on the membership application process can be found on the RCGP website: Member
-                    Ship I have read and agree to abide by the conditions set out in the South Asia MRCGP [INT.]
-                    Examination Rules and Regulations as published on the MRCGP [INT.] South Asia website:
-                    www.mrcgpintsouthasia.org If accepted for International Membership, I undertake to continue approved
-                    postgraduate study while I remain in active general practice/family practice, and to uphold and
-                    promote the aims of the RCGP to the best of my ability. I understand that, on being accepted for
-                    International Membership, an annual subscription fee is to be payable to the RCGP. I understand that
-                    only registered International Members who maintain their RCGP subscription are entitled to use the
-                    post-nominal designation "MRCGP [INT]". Success in the exam does not give me the right to refer to
-                    myself as MRCGP [INT.]. I attach a banker's draft made payable to “MRCGP [INT.] South Asia”, I also
-                    understand and agree that my personal data will be handled by the MRCGP [INT.] South Asia Board and
-                    I also give permission for my personal data to be handled by the regional MRCGP [INT.] South Asia
-                    co-ordinators..
-                  </Text>
-                </View>
-              </View>
-            </View>
-            {/* Footer */}
-            <View style={styles.footer}>
-              <Text style={styles.footerText}>
-                This document serves as a preview of your application for the South Asia MRCGP [INT.] Part 2 (OSCE)
-                Examination.
-              </Text>
-            </View>
-          </View>
-        </Page>
-
-        {/* Each document on its own page */}
-        {images.medicalLicense && (
-          <Page size="A4" style={styles.page}>
-            <View style={styles.documentPage}>
-              <Text style={styles.documentPageTitle}>Medical License</Text>
-              <Image src={images.medicalLicense || "/placeholder.svg"} style={styles.documentPageImage} />
-              <View style={styles.documentPageFooter}>
-                <Text style={styles.documentPageFooterText}>
-                  {data.fullName} - Candidate ID: {data.candidateId}
-                </Text>
-              </View>
-            </View>
-          </Page>
-        )}
-
-        {images.part1Email && (
-          <Page size="A4" style={styles.page}>
-            <View style={styles.documentPage}>
-              <Text style={styles.documentPageTitle}>Part 1 Passing Email</Text>
-              <Image src={images.part1Email || "/placeholder.svg"} style={styles.documentPageImage} />
-              <View style={styles.documentPageFooter}>
-                <Text style={styles.documentPageFooterText}>
-                  {data.fullName} - Candidate ID: {data.candidateId}
-                </Text>
-              </View>
-            </View>
-          </Page>
-        )}
-
-        {images.passportBio && (
-          <Page size="A4" style={styles.page}>
-            <View style={styles.documentPage}>
-              <Text style={styles.documentPageTitle}>Passport Bio Page</Text>
-              <Image src={images.passportBio || "/placeholder.svg"} style={styles.documentPageImage} />
-              <View style={styles.documentPageFooter}>
-                <Text style={styles.documentPageFooterText}>
-                  {data.fullName} - Candidate ID: {data.candidateId}
-                </Text>
-              </View>
-            </View>
-          </Page>
-        )}
-
-        {images.signature && (
-          <Page size="A4" style={styles.page}>
-            <View style={styles.documentPage}>
-              <Text style={styles.documentPageTitle}>Signature</Text>
-              <Image src={images.signature || "/placeholder.svg"} style={styles.documentPageImage} />
-              <View style={styles.documentPageFooter}>
-                <Text style={styles.documentPageFooterText}>
-                  {data.fullName} - Candidate ID: {data.candidateId}
-                </Text>
-              </View>
-            </View>
-          </Page>
-        )}
-      </Document>
-    )
-  }
+  
   const ApplicationPDFComplete = ({ data, images }: any) => {
     return (
       <Document>
@@ -1113,52 +782,58 @@ export function ApplicationForm() {
       })
     }
 
-    document.getElementById("pdf-download-link")?.click()
-
+    document.getElementById("preview-button")?.click()
+  
     setIsSubmitting(false)
   }
 
   const validateFile = async (file: File, inputId: string) => {
+    // List of input IDs that require validation
+    const validateThese = ["passport-image"]
+  
     // Reset error
     setFileError(null)
-
-    // Check file type
-    const validTypes = ["image/jpeg", "image/jpg", "image/png"]
-    if (!validTypes.includes(file.type)) {
-      setFileError(`Invalid file format. Only PNG and JPG formats are supported.`)
-      const fileInput = document.getElementById(inputId) as HTMLInputElement
-      if (fileInput) fileInput.value = ""
-      return false
+  
+    // Only validate if inputId is in the validation list
+    if (validateThese.includes(inputId)) {
+      // Check file type
+      const validTypes = ["image/jpeg", "image/jpg", "image/png"]
+      if (!validTypes.includes(file.type)) {
+        setFileError(`Invalid file format. Only PNG and JPG formats are supported.`)
+        const fileInput = document.getElementById(inputId) as HTMLInputElement
+        if (fileInput) fileInput.value = ""
+        return false
+      }
+  
+      // Check file size (2MB = 2 * 1024 * 1024 bytes)
+      const maxSize = 2 * 1024 * 1024
+      if (file.size > maxSize) {
+        setFileError(`File size exceeds 2MB limit. Please choose a smaller file.`)
+        const fileInput = document.getElementById(inputId) as HTMLInputElement
+        if (fileInput) fileInput.value = ""
+        return false
+      }
     }
-
-    // Check file size (2MB = 2 * 1024 * 1024 bytes)
-    const maxSize = 2 * 1024 * 1024
-    if (file.size > maxSize) {
-      setFileError(`File size exceeds 2MB limit. Please choose a smaller file.`)
-      const fileInput = document.getElementById(inputId) as HTMLInputElement
-      if (fileInput) fileInput.value = ""
-      return false
-    }
-
+  
     // Upload to Supabase
     const fileName = `${inputId}/${Date.now()}_${file.name}`
     const { error } = await supabase.storage.from("restaurant-images").upload(fileName, file)
-
+  
     if (error) {
       setFileError("Upload failed. Please try again.")
       return false
     }
-
+  
     // Get public URL
     const { data: publicUrlData } = supabase.storage.from("restaurant-images").getPublicUrl(fileName)
     const publicUrl = publicUrlData?.publicUrl
     console.log(publicUrl, "publicurl")
-
+  
     if (!publicUrl) {
       setFileError("Could not retrieve image URL.")
       return false
     }
-
+  
     // Set image URL in preview state
     switch (inputId) {
       case "passport-image":
@@ -1177,9 +852,10 @@ export function ApplicationForm() {
         setSignaturePreview(publicUrl)
         break
     }
-
+  
     return true
   }
+  
 
   console.log({
     passportPreview,
@@ -1254,12 +930,23 @@ export function ApplicationForm() {
     })
   }
 
+  const candidateId = form.watch("candidateId");
+
+  useEffect(() => {
+    if (candidateId && candidateId.length > 7) {
+      form.setValue("candidateId", "");
+    }
+  }, [candidateId]);
+  
+
+
   if (isExamClosed) {
     return <ExamClosed />
   }
   if (isClosed) {
     return <ExamClosedApp />
   }
+  
 
   return (
     <div className="container mx-auto py-8 px-4 max-w-5xl">
@@ -1322,6 +1009,7 @@ export function ApplicationForm() {
                           </FormItem>
                         )}
                       />
+                      
 
                       {/* Passport Image */}
                       <div className="space-y-2">
@@ -1410,7 +1098,7 @@ export function ApplicationForm() {
                             name="poBox"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>House no. and street or P.O.Box:</FormLabel>
+                                <FormLabel>House no. and street or P.O.Box: <span className="text-red-500">*</span></FormLabel>
                                 <FormControl>
                                   <Input
                                     placeholder="Enter P.O.Box"
@@ -1428,7 +1116,7 @@ export function ApplicationForm() {
                             name="district"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>District:</FormLabel>
+                                <FormLabel>District: <span className="text-red-500">*</span></FormLabel>
                                 <FormControl>
                                   <Input
                                     placeholder="Enter District"
@@ -1446,7 +1134,7 @@ export function ApplicationForm() {
                             name="city"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>City / Town / Village:</FormLabel>
+                                <FormLabel>City / Town / Village: <span className="text-red-500">*</span></FormLabel>
                                 <FormControl>
                                   <Input
                                     placeholder="Enter City / Town / Village"
@@ -1464,7 +1152,7 @@ export function ApplicationForm() {
                             name="province"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>Province / Region:</FormLabel>
+                                <FormLabel>Province / Region: <span className="text-red-500">*</span></FormLabel>
                                 <FormControl>
                                   <Input
                                     placeholder="Enter Province / Region"
@@ -1482,7 +1170,7 @@ export function ApplicationForm() {
                             name="country"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>Country:</FormLabel>
+                                <FormLabel>Country: <span className="text-red-500">*</span></FormLabel>
                                 <FormControl>
                                   <Input
                                     placeholder="Enter Country"
@@ -1498,8 +1186,6 @@ export function ApplicationForm() {
                       </div>
 
                       {/* Contact Details */}
-                      <div className="space-y-4">
-                        <h3 className="text-base font-medium">Contact Details</h3>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <FormField
@@ -1510,7 +1196,7 @@ export function ApplicationForm() {
                                 <FormLabel>
                                   WhatsApp number: <span className="text-red-500">*</span>
                                 </FormLabel>
-                                <FormDescription>In full international format</FormDescription>
+                                {/* <FormDescription>In full international format</FormDescription> */}
                                 <FormControl>
                                   <div className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2">
                                     <PhoneInput
@@ -1536,7 +1222,7 @@ export function ApplicationForm() {
                                 <FormLabel>
                                   Emergency contact number <span className="text-red-500">*</span>
                                 </FormLabel>
-                                <FormDescription>In full international format</FormDescription>
+                                {/* <FormDescription>In full international format</FormDescription> */}
                                 <FormControl>
                                   <div className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2">
                                     <PhoneInput
@@ -1562,10 +1248,10 @@ export function ApplicationForm() {
                                 <FormLabel>
                                   E-mail <span className="text-red-500">*</span>
                                 </FormLabel>
-                                <FormDescription>
+                                {/* <FormDescription>
                                   Please provide valid personal email address that you regularly check, as most
                                   correspondence and important announcements are communicated to candidates by email.
-                                </FormDescription>
+                                </FormDescription> */}
                                 <FormControl>
                                   <Input
                                     placeholder="Enter Email"
@@ -1646,7 +1332,6 @@ export function ApplicationForm() {
                           />
                         </div>
                       </div>
-                    </div>
                   </AccordionContent>
                 </AccordionItem>
               </Accordion>
@@ -2010,7 +1695,7 @@ export function ApplicationForm() {
 
                           <div className="space-y-2">
                             <FormLabel>
-                              Valid Medical license: (Use .png or .jpg only) <span className="text-red-500">*</span>
+                              Valid Medical license: (Use .png or .jpg only) 
                             </FormLabel>
                             <div className="flex items-center justify-center w-full">
                               {medicalLicensePreview ? (
@@ -2072,7 +1757,7 @@ export function ApplicationForm() {
 
                           <div className="space-y-2">
                             <FormLabel>
-                              Part I passing email: (Use .png or .jpg only) <span className="text-red-500">*</span>
+                              Part I passing email: (Use .png or .jpg only) 
                             </FormLabel>
                             <div className="flex items-center justify-center w-full">
                               {part1EmailPreview ? (
@@ -2137,7 +1822,7 @@ export function ApplicationForm() {
                           <div className="space-y-2">
                             <FormLabel>
                               Passport bio Page (Valid): (Use .png or .jpg only){" "}
-                              <span className="text-red-500">*</span>
+                            
                             </FormLabel>
                             <div className="flex items-center justify-center w-full">
                               {passportBioPreview ? (
@@ -2197,7 +1882,7 @@ export function ApplicationForm() {
 
                           <div className="space-y-2">
                             <FormLabel>
-                              Signature: (Use .png or .jpg only) <span className="text-red-500">*</span>
+                              Signature: (Use .png or .jpg only) 
                             </FormLabel>
                             <div className="flex items-center justify-center w-full">
                               {signaturePreview ? (
@@ -2345,10 +2030,13 @@ export function ApplicationForm() {
               <Button
                 type="button"
                 variant="outline"
+                
                 onClick={() => {
                   // Check if all required fields are filled
                   const isValid = form.formState.isValid;
-
+                  console.log(form.formState,"isValid");
+                  console.log(isValid,"isValid");
+                  
                   if (!isValid) {
                     Swal.fire({
                       title: "Missing Information",
@@ -2369,6 +2057,13 @@ export function ApplicationForm() {
                       // @ts-ignore
                       const pdfUrl = pdfBlob.href;
                       window.open(pdfUrl, "_blank");
+                      form.reset()
+                      setPassportPreview(null)
+                      setMedicalLicensePreview(null)
+                      setPart1EmailPreview(null)
+                      setPassportBioPreview(null)
+                      setSignaturePreview(null)
+                  
                     }
                   }, 500); // Increased timeout to ensure PDF generation completes
                 }}
@@ -2376,6 +2071,38 @@ export function ApplicationForm() {
               >
                 <Eye className="h-4 w-4 mr-2" />
                 Preview
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                id="preview-button"
+                onClick={() => {
+                  // Check if all required fields are filled
+                 
+
+                  // Set preview mode to true to generate PDF with current form data
+                  setPreviewMode(true);
+
+                  // Create a new window to open the PDF
+                  setTimeout(() => {
+                    const pdfBlob = document.getElementById("pdf-download-link");
+                    if (pdfBlob) {
+                      // @ts-ignore
+                      const pdfUrl = pdfBlob.href;
+                      window.open(pdfUrl, "_blank");
+                      form.reset()
+                      setPassportPreview(null)
+                      setMedicalLicensePreview(null)
+                      setPart1EmailPreview(null)
+                      setPassportBioPreview(null)
+                      setSignaturePreview(null)
+                  
+                    }
+                  }, 500); // Increased timeout to ensure PDF generation completes
+                }}
+                className=" hidden items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
+              >
+               
               </Button>
               <Button
                 type="submit"
