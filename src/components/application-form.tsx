@@ -776,8 +776,20 @@ export function ApplicationForm() {
         title: "Success!",
         text: "Form submitted successfully!",
         icon: "success",
+        confirmButtonText: "Download PDF",
+        showCancelButton: true,
+        cancelButtonText: "Close",
         confirmButtonColor: "#6366f1",
-      })
+      }).then((result) => {
+        if (result.isConfirmed) {
+          document.getElementById("pdf-download-link")?.click()
+            setTimeout(() => {
+            window.location.reload()
+            }, 10000)
+        }
+      });
+      
+      
     } else if (isWaitingAvailable) {
       application.status = "waiting"
       dispatch(addApplication(application))
@@ -786,19 +798,32 @@ export function ApplicationForm() {
         title: "Success!",
         text: "Form submitted successfully! (Added to waiting list)",
         icon: "success",
+        confirmButtonText: "Download PDF",
+        showCancelButton: true,
+        cancelButtonText: "Close",
         confirmButtonColor: "#6366f1",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          document.getElementById("pdf-download-link")?.click()
+          setTimeout(() => {
+            window.location.reload()
+            }, 10000)
+        }
       })
-    } else {
+      }
+     else {
       dispatch(toggleBlockExam(params.examId))
       Swal.fire({
         title: "Error",
         text: "No more slots available for this exam.",
         icon: "error",
         confirmButtonColor: "#6366f1",
+        
       })
+      
     }
 
-    document.getElementById("preview-button")?.click()
+    // document.getElementById("preview-button")?.click()
   
     setIsSubmitting(false)
   }
