@@ -1840,7 +1840,7 @@ export function ApplicationForm() {
 
                           <div className="space-y-2">
                             <FormLabel>
-                              Passport bio Page (Valid): (Use .png or .jpg only){" "}
+                              Passport bio Page (Valid): (Use .png or .jpg only){" "} <span className="text-red-500">*</span>
                             
                             </FormLabel>
                             <div className="flex items-center justify-center w-full">
@@ -1902,7 +1902,7 @@ export function ApplicationForm() {
 
                           <div className="space-y-2">
                             <FormLabel>
-                              Signature: (Use .png or .jpg only) 
+                              Signature: (Use .png or .jpg only) <span className="text-red-500">*</span>
                             </FormLabel>
                             <div className="flex items-center justify-center w-full">
                               {signaturePreview ? (
