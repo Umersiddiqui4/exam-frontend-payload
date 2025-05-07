@@ -247,3 +247,6 @@ html[class~="dark"] {
 [data-theme="light"] {
   color-scheme: light;
 }
+warning {
+  color: red !important;
+}

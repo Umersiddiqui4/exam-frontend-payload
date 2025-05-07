@@ -46,6 +46,7 @@ import { useMemo } from "react"
 import NotFound from "./ui/notFound"
 import ExamClosedApp from "./ui/examClosedApplication"
 import ExamClosed from "./ui/examClosed"
+import "../App.css"
 
 // Form schema
 const formSchema = z.object({
@@ -150,6 +151,7 @@ export function ApplicationForm() {
   const [availableDates, setAvailableDates] = useState<Date[]>([])
   const [isExamClosed, setIsExamClosed] = useState(false)
   const [isClosed, setIsClosed] = useState(false)
+  const [warning, setWarning] = useState(false)
   const [selectedDates, setSelectedDates] = useState<{
     preferenceDate1: string | null
     preferenceDate2: string | null
@@ -694,9 +696,10 @@ export function ApplicationForm() {
   }, [selectedExam])
 
   console.log(isExamClosed, "isExamClosed")
+  console.log(warning, "warning");
+
 
   async function onSubmit(data: FormValues) {
-    setIsSubmitting(true)
 
     // Validate phone numbers
     const phoneRegex = /^\+?[1-9]\d{1,14}$/
@@ -725,6 +728,19 @@ export function ApplicationForm() {
       return
     }
 
+    if (
+      signaturePreview === null ||
+      medicalLicensePreview === null ||
+      passportBioPreview === null
+    ) {
+      setWarning(true);
+      return;
+    } else {
+      setWarning(false);
+    }
+    
+    setIsSubmitting(true)
+    
     const isPendingAvailable = selectedExam.receivingApplicationsCount < selectedExam.applicationsLimit
 
     const isWaitingAvailable =
@@ -1695,7 +1711,7 @@ export function ApplicationForm() {
 
                           <div className="space-y-2">
                             <FormLabel>
-                              Valid Medical license: (Use .png or .jpg only) 
+                              Valid Medical license: (Use .png or .jpg only)   <span className="text-red-500">*</span>
                             </FormLabel>
                             <div className="flex items-center justify-center w-full">
                               {medicalLicensePreview ? (
@@ -1731,12 +1747,14 @@ export function ApplicationForm() {
                               ) : (
                                 <label
                                   htmlFor="medical-license"
-                                  className="flex flex-col items-center justify-center w-full h-24 border-2 border-dashed rounded-lg cursor-pointer bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700"
+                                  className={warning ? "border-red-700 flex flex-col items-center justify-center w-full h-24 border-2 border-dashed rounded-lg cursor-pointer bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 " :"flex flex-col items-center justify-center w-full h-24 border-2 border-dashed rounded-lg cursor-pointer bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 "}
+
                                 >
-                                  <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                                    <Upload className="w-6 h-6 mb-1 text-slate-500 dark:text-slate-400" />
+                                  <div className={`flex flex-col items-center justify-center pt-5 pb-6 `}>
+
+                                    <Upload className="w-6 h-6 mb-1 text-slate-500 dark:text-slate-400"/>
                                     <p className="text-xs text-slate-500 dark:text-slate-400">
-                                      <span className="font-semibold">Click to upload</span> or drag and drop
+                                      <span className={`font-semibold`}>Click to upload</span> or drag and drop
                                     </p>
                                   </div>
                                   <input
@@ -1791,7 +1809,8 @@ export function ApplicationForm() {
                               ) : (
                                 <label
                                   htmlFor="part1-email"
-                                  className="flex flex-col items-center justify-center w-full h-24 border-2 border-dashed rounded-lg cursor-pointer bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700"
+                                  className={"flex flex-col items-center justify-center w-full h-24 border-2 border-dashed rounded-lg cursor-pointer bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 "}
+
                                 >
                                   <div className="flex flex-col items-center justify-center pt-5 pb-6">
                                     <Upload className="w-6 h-6 mb-1 text-slate-500 dark:text-slate-400" />
@@ -1856,7 +1875,8 @@ export function ApplicationForm() {
                               ) : (
                                 <label
                                   htmlFor="passport-bio"
-                                  className="flex flex-col items-center justify-center w-full h-24 border-2 border-dashed rounded-lg cursor-pointer bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700"
+                                  className={warning ? "border-red-700 flex flex-col items-center justify-center w-full h-24 border-2 border-dashed rounded-lg cursor-pointer bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 " :"flex flex-col items-center justify-center w-full h-24 border-2 border-dashed rounded-lg cursor-pointer bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 "}
+
                                 >
                                   <div className="flex flex-col items-center justify-center pt-5 pb-6">
                                     <Upload className="w-6 h-6 mb-1 text-slate-500 dark:text-slate-400" />
@@ -1911,7 +1931,8 @@ export function ApplicationForm() {
                               ) : (
                                 <label
                                   htmlFor="signature"
-                                  className="flex flex-col items-center justify-center w-full h-24 border-2 border-dashed rounded-lg cursor-pointer bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700"
+                                  className={warning ? "border-red-700 flex flex-col items-center justify-center w-full h-24 border-2 border-dashed rounded-lg cursor-pointer bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 " :"flex flex-col items-center justify-center w-full h-24 border-2 border-dashed rounded-lg cursor-pointer bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 "}
+
                                 >
                                   <div className="flex flex-col items-center justify-center pt-5 pb-6">
                                     <Upload className="w-6 h-6 mb-1 text-slate-500 dark:text-slate-400" />
