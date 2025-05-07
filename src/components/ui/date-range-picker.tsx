@@ -1,4 +1,4 @@
-"use client"
+import { useState } from "react"
 import { format } from "date-fns"
 import { CalendarIcon } from "lucide-react"
 import type { DateRange } from "react-day-picker"
@@ -17,9 +17,20 @@ export function DatePickerWithRange({
   date: DateRange | undefined
   setDate: (date: DateRange | undefined) => void
 }) {
+  const [open, setOpen] = useState(false)
+
+  function handleOkay() {
+    setOpen(false) // just close
+  }
+
+  function handleCancel() {
+    setDate(undefined)
+    setOpen(false) // just close
+  }
+
   return (
     <div className={cn("grid gap-2", className)}>
-      <Popover>
+      <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
             id="date"
@@ -49,6 +60,12 @@ export function DatePickerWithRange({
             onSelect={setDate}
             numberOfMonths={2}
           />
+          {(date?.from || date?.to) && (
+            <div className="flex justify-end gap-3 p-4 w-full">
+              <Button onClick={handleOkay}>Okay</Button>
+              <Button onClick={handleCancel} variant="ghost">Cancel</Button>
+            </div>
+          )}
         </PopoverContent>
       </Popover>
     </div>

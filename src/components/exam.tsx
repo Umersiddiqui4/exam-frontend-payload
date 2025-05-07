@@ -94,7 +94,7 @@ function DateRangePickerWithRange({
 
   return (
     <div className={cn("grid gap-2", className)}>
-      <DatePickerWithRange date={date} setDate={handleDateChange} />
+      <DatePickerWithRange date={date} setDate={handleDateChange}  />
     </div>
   );
 }
