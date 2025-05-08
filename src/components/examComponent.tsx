@@ -5,6 +5,7 @@ import {
   Moon,
   Settings,
   Sun,
+  UserSquare,
   X,
 } from "lucide-react";
 import { Exam } from "./exam";
@@ -70,16 +71,16 @@ export default function ExamComponent() {
                   Dashboard
                 </Button>
               </li>
-              {/* <li>
+              <li>
                 <Button
                   variant="ghost"
                   className="w-full justify-start text-slate-100 hover:bg-slate-700/50 dark:hover:bg-slate-800/50"
-                  onClick={() => nav("/application")}
+                  onClick={() => nav("/applications")}
                 >
-                  <Users className="mr-2 h-5 w-5" />
+                  <UserSquare className="mr-2 h-5 w-5" />
                   Applications
                 </Button>
-              </li> */}
+              </li>
               <li>
                 <Button
                   variant="ghost"

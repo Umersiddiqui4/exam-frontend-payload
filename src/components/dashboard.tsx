@@ -10,6 +10,8 @@ import {
   Sun,
   Menu,
   X,
+  UserSquare2,
+  UserSquare,
 } from "lucide-react";
 
 import { Button } from "../components/ui/button";
@@ -95,6 +97,16 @@ export function Dashboard() {
                 >
                   <LayoutDashboard className="mr-2 h-5 w-5" />
                   Dashboard
+                </Button>
+              </li>
+              <li>
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start text-slate-100 hover:bg-slate-700/50 dark:hover:bg-slate-800/50"
+                  onClick={() => nav("/applications")}
+                >
+                  <UserSquare className="mr-2 h-5 w-5" />
+                  Applications
                 </Button>
               </li>
               <li>
