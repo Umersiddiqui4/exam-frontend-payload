@@ -451,7 +451,7 @@ export function ApplicationForm() {
                 <View style={styles.fieldRow}>
                   <Text style={styles.fieldLabel}>Preference Date 1:</Text>
                   <Text style={styles.fieldValue}>
-                    {data.preferenceDate1
+                    {data.preferenceDate1 && data.preferenceDate1 !== " "
                       ? format(new Date(data.preferenceDate1), "PPP")
                       : "Not provided"}
                   </Text>
@@ -459,7 +459,7 @@ export function ApplicationForm() {
                 <View style={styles.fieldRow}>
                   <Text style={styles.fieldLabel}>Preference Date 2:</Text>
                   <Text style={styles.fieldValue}>
-                    {data.preferenceDate2
+                    {data.preferenceDate2 && data.preferenceDate2 !== " "
                       ? format(new Date(data.preferenceDate2), "PPP")
                       : "Not provided"}
                   </Text>
@@ -467,7 +467,7 @@ export function ApplicationForm() {
                 <View style={styles.fieldRow}>
                   <Text style={styles.fieldLabel}>Preference Date 3:</Text>
                   <Text style={styles.fieldValue}>
-                    {data.preferenceDate3
+                    {data.preferenceDate3 && data.preferenceDate3 !== " "
                       ? format(new Date(data.preferenceDate3), "PPP")
                       : "Not provided"}
                   </Text>
@@ -1081,13 +1081,13 @@ export function ApplicationForm() {
   useEffect(() => {
     const subscription = form.watch((value) => {
       setSelectedDates({
-        preferenceDate1: value.preferenceDate1
+        preferenceDate1: value.preferenceDate1 && value.preferenceDate1 !== " "
           ? new Date(value.preferenceDate1)?.toISOString()
           : null,
-        preferenceDate2: value.preferenceDate2
+        preferenceDate2: value.preferenceDate2 && value.preferenceDate2 !== " "
           ? new Date(value.preferenceDate2)?.toISOString()
           : null,
-        preferenceDate3: value.preferenceDate3
+        preferenceDate3: value.preferenceDate3 && value.preferenceDate3 !== " "
           ? new Date(value.preferenceDate3)?.toISOString()
           : null,
       });
@@ -1133,7 +1133,12 @@ export function ApplicationForm() {
     } else {
       setError(null);
     }
-  };
+  }; 
+
+  function test(test: any) {
+    console.log("test");
+    
+  }
 
   if (isExamClosed) {
     return <ExamClosed />;
@@ -1823,7 +1828,7 @@ export function ApplicationForm() {
                                   </SelectTrigger>
                                 </FormControl>
                                 <SelectContent className="dark:bg-slate-800 dark:border-slate-700">
-                                  <SelectItem key="" value={""}>
+                                  <SelectItem key="" value={" "}>
                                     None
                                   </SelectItem>
                                   {getAvailableDatesForField(
@@ -1856,7 +1861,7 @@ export function ApplicationForm() {
                                   </SelectTrigger>
                                 </FormControl>
                                 <SelectContent className="dark:bg-slate-800 dark:border-slate-700">
-                                  <SelectItem key="" value={""}>
+                                  <SelectItem key="" value={" "}>
                                     None
                                   </SelectItem>
                                   {getAvailableDatesForField(
@@ -1889,7 +1894,7 @@ export function ApplicationForm() {
                                   </SelectTrigger>
                                 </FormControl>
                                 <SelectContent className="dark:bg-slate-800 dark:border-slate-700">
-                                  <SelectItem key="" value={""}>
+                                  <SelectItem key="" value={" "}>
                                     None
                                   </SelectItem>
                                   {getAvailableDatesForField(
@@ -2457,10 +2462,11 @@ export function ApplicationForm() {
                 <Button
                   type="button"
                   variant="outline"
+                  
                   onClick={() => {
+                    form.handleSubmit(test)();
                     // Check if all required fields are filled
                     const isValid = form.formState.isValid;
-
                     if (!isValid) {
                       Swal.fire({
                         title: "Missing Information",
