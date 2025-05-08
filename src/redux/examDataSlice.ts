@@ -40,9 +40,7 @@ const examDataSlice = createSlice({
     },
     updateExam(state, action: PayloadAction<ExamData>) {
       const updatedExam = action.payload;
-    
-      console.log("Updated Exam ID:", updatedExam.id);
-      console.log("Current Exams:");
+
       state.exams.forEach((exam, i) => {
         console.log(`Index ${i}: Exam ID = ${exam.id}`);
       });

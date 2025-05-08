@@ -61,7 +61,6 @@ import {
   selectApplications,
   setApplicationStatus,
 } from "@/redux/applicationsSlice";
-// Removed unused import
 import { format } from "date-fns";
 import { pdf } from "@react-pdf/renderer";
 
@@ -80,8 +79,6 @@ export function Dashboard() {
   const initialExams = useSelector(selectExams);
   const applications = useSelector(selectApplications);
   const [pdfGenerating] = useState(false);
-
-  console.log(selectedExam, "examId");
 
   const handleLogout = () => {
     dispatch(logout());
@@ -104,7 +101,6 @@ export function Dashboard() {
         (app) => app.status === activeFilter
       );
     }
-    console.log(activeFilter, "activeFilter");
 
     // Then filter by exam
     if (selectedExam !== "all") {
@@ -720,8 +716,6 @@ export function Dashboard() {
     window.open(url, "_blank");
   };
 
-  console.log(applications, "application");
-
   const handleExport = () => {
     setIsExporting(true);
 
@@ -789,7 +783,7 @@ export function Dashboard() {
         const examName =
           selectedExam !== "all"
             ? initialExams.find((exam) => exam.id.toString() === selectedExam)
-              ?.name || "Selected-Exam"
+                ?.name || "Selected-Exam"
             : "All-Exams";
 
         const url = URL.createObjectURL(blob);
@@ -819,7 +813,6 @@ export function Dashboard() {
     cell: ({ row }: { row: any }) => {
       const id = row.original.id;
       const status = row.original.status;
-      console.log(row.original, "row");
 
       return (
         <div className="flex space-x-2">
@@ -868,8 +861,9 @@ export function Dashboard() {
       {/* Sidebar - transforms to top navbar on mobile */}
       {sidebarOpen && (
         <div
-          className={`${isMobile ? "fixed top-0 left-0 z-50 w-64 h-full" : "w-64"
-            } bg-slate-800 text-slate-100 shadow-lg transition-all duration-300 dark:bg-slate-900`}
+          className={`${
+            isMobile ? "fixed top-0 left-0 z-50 w-64 h-full" : "w-64"
+          } bg-slate-800 text-slate-100 shadow-lg transition-all duration-300 dark:bg-slate-900`}
         >
           <div className="p-4 flex items-center justify-between">
             <div className="flex items-center space-x-2">

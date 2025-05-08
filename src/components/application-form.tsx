@@ -1,52 +1,96 @@
-"use client"
+"use client";
 
-import { Checkbox } from "@/components/ui/checkbox"
-import Swal from "sweetalert2"
+import { Checkbox } from "@/components/ui/checkbox";
+import Swal from "sweetalert2";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
-import { Calendar as CalendarComponent } from "@/components/ui/calendar"
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 
-import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover"
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+} from "@/components/ui/popover";
 
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
 
-import { Input } from "@/components/ui/input"
+import { Input } from "@/components/ui/input";
 
-import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion"
+import {
+  Accordion,
+  AccordionItem,
+  AccordionTrigger,
+  AccordionContent,
+} from "@/components/ui/accordion";
 
-import { Form, FormItem, FormLabel, FormControl, FormDescription, FormMessage, FormField } from "@/components/ui/form"
+import {
+  Form,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormDescription,
+  FormMessage,
+  FormField,
+} from "@/components/ui/form";
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 
-import { CardContent } from "@/components/ui/card"
+import { CardContent } from "@/components/ui/card";
 
-import { CardDescription } from "@/components/ui/card"
+import { CardDescription } from "@/components/ui/card";
 
-import { CardTitle } from "@/components/ui/card"
+import { CardTitle } from "@/components/ui/card";
 
-import { CardHeader } from "@/components/ui/card"
+import { CardHeader } from "@/components/ui/card";
 
-import { Card } from "@/components/ui/card"
-import { useState, useEffect } from "react"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import * as z from "zod"
-import { format } from "date-fns"
-import { Upload, Calendar, User, FileText, Shield, Loader2, Eye } from "lucide-react"
-import { PhoneInput } from "./ui/phone-input"
-import "react-phone-number-input/style.css"
-import { useParams } from "react-router-dom"
-import { useDispatch, useSelector } from "react-redux"
-import { incrementApplicationsCount, selectExams, toggleBlockExam } from "@/redux/examDataSlice"
-import { supabase } from "@/lib/supabaseClient"
-import { addApplication, selectApplications } from "@/redux/applicationsSlice"
-import { PDFDownloadLink, Document, Page, Text, View, StyleSheet, Image } from "@react-pdf/renderer"
-import { useMemo } from "react"
-import NotFound from "./ui/notFound"
-import ExamClosedApp from "./ui/examClosedApplication"
-import ExamClosed from "./ui/examClosed"
-import "../App.css"
+import { Card } from "@/components/ui/card";
+import { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { format } from "date-fns";
+import {
+  Upload,
+  Calendar,
+  User,
+  FileText,
+  Shield,
+  Loader2,
+  Eye,
+} from "lucide-react";
+import { PhoneInput } from "./ui/phone-input";
+import "react-phone-number-input/style.css";
+import { useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  incrementApplicationsCount,
+  selectExams,
+  toggleBlockExam,
+} from "@/redux/examDataSlice";
+import { supabase } from "@/lib/supabaseClient";
+import { addApplication } from "@/redux/applicationsSlice";
+import {
+  PDFDownloadLink,
+  Document,
+  Page,
+  Text,
+  View,
+  StyleSheet,
+  Image,
+} from "@react-pdf/renderer";
+import { useMemo } from "react";
+import NotFound from "./ui/notFound";
+import ExamClosedApp from "./ui/examClosedApplication";
+import ExamClosed from "./ui/examClosed";
+import "../App.css";
+import { isValidPhoneNumber } from "libphonenumber-js";
 
 // Form schema
 const formSchema = z.object({
@@ -56,7 +100,7 @@ const formSchema = z.object({
     .regex(/^\d+$/, "Candidate ID must contain only numbers"),
   passportImage: z.any().optional(),
   fullName: z.string().min(2, "Full name is required"),
- 
+
   // Address
   poBox: z.string().min(1, "P.O. Box is required"),
   district: z.string().min(1, "District is required"),
@@ -70,13 +114,19 @@ const formSchema = z.object({
   email: z.string().email("Invalid email address"),
 
   // Experience
-  dateOfPassingPart1: z.string().min(1, "Date of passing Part 1 exam is required"),
-  previousOsceAttempts: z.string().min(1, "Number of previous OSCE attempts is required"),
+  dateOfPassingPart1: z
+    .string()
+    .min(1, "Date of passing Part 1 exam is required"),
+  previousOsceAttempts: z
+    .string()
+    .min(1, "Number of previous OSCE attempts is required"),
 
   // Experience and License
   countryOfExperience: z.string().min(1, "Country of experience is required"),
   countryOfOrigin: z.string().min(1, "Country of origin is required"),
-  registrationAuthority: z.string().min(1, "Registration authority is required"),
+  registrationAuthority: z
+    .string()
+    .min(1, "Registration authority is required"),
   registrationNumber: z.string().min(1, "Registration number is required"),
   dateOfRegistration: z.date({
     required_error: "Date of registration is required",
@@ -101,9 +151,9 @@ const formSchema = z.object({
   termsAgreed: z.boolean().refine((val) => val === true, {
     message: "You must agree to the terms and conditions",
   }),
-})
+});
 
-type FormValues = z.infer<typeof formSchema>
+type FormValues = z.infer<typeof formSchema>;
 
 // Part 1 exam dates
 const part1ExamDates = [
@@ -112,67 +162,68 @@ const part1ExamDates = [
   "AKT – May 2024",
   "AKT – February 2024",
   "AKT – November 2023",
-]
+];
 
 const parseSlotDates = (slotString: string): Date[] => {
   // If the slot string contains a range (e.g., "2025-04-02 | 2025-04-08")
-  const dates = slotString.split(" | ")
+  const dates = slotString.split(" | ");
 
   if (dates.length === 2) {
-    const startDate = new Date(dates[0])
-    const endDate = new Date(dates[1])
+    const startDate = new Date(dates[0]);
+    const endDate = new Date(dates[1]);
 
     // Generate all dates between start and end (inclusive)
-    const allDates: Date[] = []
-    const currentDate = new Date(startDate)
+    const allDates: Date[] = [];
+    const currentDate = new Date(startDate);
 
     while (currentDate <= endDate) {
-      allDates.push(new Date(currentDate))
-      currentDate.setDate(currentDate.getDate() + 1)
+      allDates.push(new Date(currentDate));
+      currentDate.setDate(currentDate.getDate() + 1);
     }
 
-    return allDates
+    return allDates;
   }
 
   // If it's not a range, just return the parsed dates
-  return dates.map((dateStr) => new Date(dateStr))
-}
+  return dates.map((dateStr) => new Date(dateStr));
+};
 
 export function ApplicationForm() {
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [previewMode, setPreviewMode] = useState(false)
-  const [fileError, setFileError] = useState<string | null>(null)
-  const [passportPreview, setPassportPreview] = useState<string | null>(null)
-  const [medicalLicensePreview, setMedicalLicensePreview] = useState<string | null>(null)
-  const [part1EmailPreview, setPart1EmailPreview] = useState<string | null>(null)
-  const [passportBioPreview, setPassportBioPreview] = useState<string | null>(null)
-  const [signaturePreview, setSignaturePreview] = useState<string | null>(null)
-  const [pdfGenerating] = useState(false)
-  const [availableDates, setAvailableDates] = useState<Date[]>([])
-  const [isExamClosed, setIsExamClosed] = useState(false)
-  const [isClosed, setIsClosed] = useState(false)
-  const [warning, setWarning] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [fileError, setFileError] = useState<string | null>(null);
+  const [passportPreview, setPassportPreview] = useState<string | null>(null);
+  const [medicalLicensePreview, setMedicalLicensePreview] = useState<
+    string | null
+  >(null);
+  const [part1EmailPreview, setPart1EmailPreview] = useState<string | null>(
+    null
+  );
+  const [passportBioPreview, setPassportBioPreview] = useState<string | null>(
+    null
+  );
+  const [signaturePreview, setSignaturePreview] = useState<string | null>(null);
+  const [pdfGenerating] = useState(false);
+  const [availableDates, setAvailableDates] = useState<Date[]>([]);
+  const [isExamClosed, setIsExamClosed] = useState(false);
+  const [isClosed, setIsClosed] = useState(false);
+  const [warning, setWarning] = useState(false);
   const [selectedDates, setSelectedDates] = useState<{
-    preferenceDate1: string | null
-    preferenceDate2: string | null
-    preferenceDate3: string | null
+    preferenceDate1: string | null;
+    preferenceDate2: string | null;
+    preferenceDate3: string | null;
   }>({
     preferenceDate1: null,
     preferenceDate2: null,
     preferenceDate3: null,
-  })
-  const exams = useSelector(selectExams)
-  const applications = useSelector(selectApplications)
-  const params = useParams()
-  const dispatch = useDispatch()
-  console.log(params.examId, "params")
-  console.log(applications, "applications")
+  });
+  const exams = useSelector(selectExams);
+  const params = useParams();
+  const dispatch = useDispatch();
 
-  if (!params.examId) return null
+  if (!params.examId) return null;
 
-  const selectedExam = exams.find((exam) => exam.id === params.examId)
-  console.log(selectedExam, "selectedExam")
-  if (selectedExam === undefined) return <NotFound />
+  const selectedExam = exams.find((exam) => exam.id === params.examId);
+  if (selectedExam === undefined) return <NotFound />;
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -194,11 +245,9 @@ export function ApplicationForm() {
       registrationNumber: "",
       termsAgreed: false,
     },
-  })
-  console.log(form, "form")
-
+  });
   // PDF Document Component with multi-page support
-  
+
   const ApplicationPDFComplete = ({ data, images }: any) => {
     return (
       <Document>
@@ -210,10 +259,17 @@ export function ApplicationForm() {
               <Image src="/icon.png" style={styles.passportImage1} />
               <div className="text-center">
                 <Text style={styles.title}>MRCGP [INT.] South Asia</Text>
-                <Text style={styles.subtitle}>Part 2 (OSCE) Examination Application</Text>
+                <Text style={styles.subtitle}>
+                  Part 2 (OSCE) Examination Application
+                </Text>
               </div>
             </View>
-            {images.passport && <Image src={images.passport || "/placeholder.svg"} style={styles.passportImage} />}
+            {images.passport && (
+              <Image
+                src={images.passport || "/placeholder.svg"}
+                style={styles.passportImage}
+              />
+            )}
           </View>
 
           {/* Main content - Resume style format */}
@@ -221,18 +277,24 @@ export function ApplicationForm() {
             {/* Candidate information section */}
             <View style={styles.resumeSection}>
               <View style={styles.resumeHeader}>
-                <Text style={styles.resumeSectionTitle}>CANDIDATE INFORMATION</Text>
+                <Text style={styles.resumeSectionTitle}>
+                  CANDIDATE INFORMATION
+                </Text>
               </View>
               <View style={styles.resumeBody}>
                 <View style={styles.row}>
                   <View style={styles.column}>
                     <View style={styles.fieldRow}>
                       <Text style={styles.fieldLabel}>Candidate ID:</Text>
-                      <Text style={styles.fieldValue}>{data.candidateId || "Not provided"}</Text>
+                      <Text style={styles.fieldValue}>
+                        {data.candidateId || "Not provided"}
+                      </Text>
                     </View>
                     <View style={styles.fieldRow}>
                       <Text style={styles.fieldLabel}>Full Name:</Text>
-                      <Text style={styles.fieldValue}>{data.fullName || "Not provided"}</Text>
+                      <Text style={styles.fieldValue}>
+                        {data.fullName || "Not provided"}
+                      </Text>
                     </View>
                   </View>
                 </View>
@@ -242,22 +304,30 @@ export function ApplicationForm() {
             {/* Contact information section */}
             <View style={styles.resumeSection}>
               <View style={styles.resumeHeader}>
-                <Text style={styles.resumeSectionTitle}>CONTACT INFORMATION</Text>
+                <Text style={styles.resumeSectionTitle}>
+                  CONTACT INFORMATION
+                </Text>
               </View>
               <View style={styles.resumeBody}>
                 <View style={styles.row}>
                   <View style={styles.column}>
                     <View style={styles.fieldRow}>
                       <Text style={styles.fieldLabel}>WhatsApp:</Text>
-                      <Text style={styles.fieldValue}>{data.whatsapp || "Not provided"}</Text>
+                      <Text style={styles.fieldValue}>
+                        {data.whatsapp || "Not provided"}
+                      </Text>
                     </View>
                     <View style={styles.fieldRow}>
                       <Text style={styles.fieldLabel}>Emergency Contact:</Text>
-                      <Text style={styles.fieldValue}>{data.emergencyContact || "Not provided"}</Text>
+                      <Text style={styles.fieldValue}>
+                        {data.emergencyContact || "Not provided"}
+                      </Text>
                     </View>
                     <View style={styles.fieldRow}>
                       <Text style={styles.fieldLabel}>Email:</Text>
-                      <Text style={styles.fieldValue}>{data.email || "Not provided"}</Text>
+                      <Text style={styles.fieldValue}>
+                        {data.email || "Not provided"}
+                      </Text>
                     </View>
                   </View>
                 </View>
@@ -268,18 +338,24 @@ export function ApplicationForm() {
 
             <View style={styles.resumeSection}>
               <View style={styles.resumeHeader}>
-                <Text style={styles.resumeSectionTitle}>CONTACT INFORMATION</Text>
+                <Text style={styles.resumeSectionTitle}>
+                  CONTACT INFORMATION
+                </Text>
               </View>
               <View style={styles.resumeBody}>
                 <View style={styles.row}>
                   <View style={styles.column}>
                     <View style={styles.fieldRow}>
                       <Text style={styles.fieldLabel}>Post Box:</Text>
-                      <Text style={styles.fieldValue}>{data.poBox || "No address"}</Text>
+                      <Text style={styles.fieldValue}>
+                        {data.poBox || "No address"}
+                      </Text>
                     </View>
                     <View style={styles.fieldRow}>
                       <Text style={styles.fieldLabel}>District</Text>
-                      <Text style={styles.fieldValue}>{data.district || ""}</Text>
+                      <Text style={styles.fieldValue}>
+                        {data.district || ""}
+                      </Text>
                     </View>
                     <View style={styles.fieldRow}>
                       <Text style={styles.fieldLabel}>City:</Text>
@@ -287,11 +363,15 @@ export function ApplicationForm() {
                     </View>
                     <View style={styles.fieldRow}>
                       <Text style={styles.fieldLabel}>province:</Text>
-                      <Text style={styles.fieldValue}>{data.province || ""}</Text>
+                      <Text style={styles.fieldValue}>
+                        {data.province || ""}
+                      </Text>
                     </View>
                     <View style={styles.fieldRow}>
                       <Text style={styles.fieldLabel}>Country:</Text>
-                      <Text style={styles.fieldValue}>{data.country || ""}</Text>
+                      <Text style={styles.fieldValue}>
+                        {data.country || ""}
+                      </Text>
                     </View>
                   </View>
                 </View>
@@ -306,19 +386,27 @@ export function ApplicationForm() {
               <View style={styles.resumeBody}>
                 <View style={styles.fieldRow}>
                   <Text style={styles.fieldLabel}>Date of passing Part 1:</Text>
-                  <Text style={styles.fieldValue}>{data.dateOfPassingPart1 || "Not provided"}</Text>
+                  <Text style={styles.fieldValue}>
+                    {data.dateOfPassingPart1 || "Not provided"}
+                  </Text>
                 </View>
                 <View style={styles.fieldRow}>
                   <Text style={styles.fieldLabel}>Previous OSCE attempts:</Text>
-                  <Text style={styles.fieldValue}>{data.previousOsceAttempts || "Not provided"}</Text>
+                  <Text style={styles.fieldValue}>
+                    {data.previousOsceAttempts || "Not provided"}
+                  </Text>
                 </View>
                 <View style={styles.fieldRow}>
                   <Text style={styles.fieldLabel}>Country of experience:</Text>
-                  <Text style={styles.fieldValue}>{data.countryOfExperience || "Not provided"}</Text>
+                  <Text style={styles.fieldValue}>
+                    {data.countryOfExperience || "Not provided"}
+                  </Text>
                 </View>
                 <View style={styles.fieldRow}>
                   <Text style={styles.fieldLabel}>Country of origin:</Text>
-                  <Text style={styles.fieldValue}>{data.countryOfOrigin || "Not provided"}</Text>
+                  <Text style={styles.fieldValue}>
+                    {data.countryOfOrigin || "Not provided"}
+                  </Text>
                 </View>
               </View>
             </View>
@@ -331,16 +419,22 @@ export function ApplicationForm() {
               <View style={styles.resumeBody}>
                 <View style={styles.fieldRow}>
                   <Text style={styles.fieldLabel}>Registration authority:</Text>
-                  <Text style={styles.fieldValue}>{data.registrationAuthority || "Not provided"}</Text>
+                  <Text style={styles.fieldValue}>
+                    {data.registrationAuthority || "Not provided"}
+                  </Text>
                 </View>
                 <View style={styles.fieldRow}>
                   <Text style={styles.fieldLabel}>Registration number:</Text>
-                  <Text style={styles.fieldValue}>{data.registrationNumber || "Not provided"}</Text>
+                  <Text style={styles.fieldValue}>
+                    {data.registrationNumber || "Not provided"}
+                  </Text>
                 </View>
                 <View style={styles.fieldRow}>
                   <Text style={styles.fieldLabel}>Date of registration:</Text>
                   <Text style={styles.fieldValue}>
-                    {data.dateOfRegistration ? format(data.dateOfRegistration, "PPP") : "Not provided"}
+                    {data.dateOfRegistration
+                      ? format(data.dateOfRegistration, "PPP")
+                      : "Not provided"}
                   </Text>
                 </View>
               </View>
@@ -349,25 +443,33 @@ export function ApplicationForm() {
             {/* OSCE Session Preferences */}
             <View style={styles.resumeSection}>
               <View style={styles.resumeHeader}>
-                <Text style={styles.resumeSectionTitle}>OSCE SESSION PREFERENCES</Text>
+                <Text style={styles.resumeSectionTitle}>
+                  OSCE SESSION PREFERENCES
+                </Text>
               </View>
               <View style={styles.resumeBody}>
                 <View style={styles.fieldRow}>
                   <Text style={styles.fieldLabel}>Preference Date 1:</Text>
                   <Text style={styles.fieldValue}>
-                    {data.preferenceDate1 ? format(new Date(data.preferenceDate1), "PPP") : "Not provided"}
+                    {data.preferenceDate1
+                      ? format(new Date(data.preferenceDate1), "PPP")
+                      : "Not provided"}
                   </Text>
                 </View>
                 <View style={styles.fieldRow}>
                   <Text style={styles.fieldLabel}>Preference Date 2:</Text>
                   <Text style={styles.fieldValue}>
-                    {data.preferenceDate2 ? format(new Date(data.preferenceDate2), "PPP") : "Not provided"}
+                    {data.preferenceDate2
+                      ? format(new Date(data.preferenceDate2), "PPP")
+                      : "Not provided"}
                   </Text>
                 </View>
                 <View style={styles.fieldRow}>
                   <Text style={styles.fieldLabel}>Preference Date 3:</Text>
                   <Text style={styles.fieldValue}>
-                    {data.preferenceDate3 ? format(new Date(data.preferenceDate3), "PPP") : "Not provided"}
+                    {data.preferenceDate3
+                      ? format(new Date(data.preferenceDate3), "PPP")
+                      : "Not provided"}
                   </Text>
                 </View>
               </View>
@@ -381,17 +483,23 @@ export function ApplicationForm() {
               <View style={styles.resumeBody}>
                 <View style={styles.fieldRow}>
                   <Text style={styles.fieldLabel}>Name:</Text>
-                  <Text style={styles.fieldValue}>{data.agreementName || "Not provided"}</Text>
+                  <Text style={styles.fieldValue}>
+                    {data.agreementName || "Not provided"}
+                  </Text>
                 </View>
                 <View style={styles.fieldRow}>
                   <Text style={styles.fieldLabel}>Date:</Text>
                   <Text style={styles.fieldValue}>
-                    {data.agreementDate ? format(data.agreementDate, "PPP") : "Not provided"}
+                    {data.agreementDate
+                      ? format(data.agreementDate, "PPP")
+                      : "Not provided"}
                   </Text>
                 </View>
                 <View style={styles.fieldRow}>
                   <Text style={styles.fieldLabel}>Terms Agreed:</Text>
-                  <Text style={styles.fieldValue}>{data.termsAgreed ? "Yes" : "No"}</Text>
+                  <Text style={styles.fieldValue}>
+                    {data.termsAgreed ? "Yes" : "No"}
+                  </Text>
                 </View>
               </View>
             </View>
@@ -402,42 +510,62 @@ export function ApplicationForm() {
               <View style={styles.resumeBody}>
                 <View style={styles.fieldRow}>
                   <Text style={styles.note}>
-                    THE NUMBER OF PLACES IS LIMITED, AND SLOTS WILL BE ALLOCATED ON THE "FIRST COME FIRST SERVED” BASIS.
-                    Your application may be rejected because of a large number of applicants and you may be invited to
-                    apply again or offered a slot at a subsequent examination. Priority will be given to applicants from
-                    South Asia and those applications that reach us first, so we encourage you to apply as soon as
-                    possible. WHILST WE WILL TRY TO ACCOMMODATE YOUR PREFERENCE, IT MAY NOT BE POSSIBLE DUE TO A LARGE
-                    NUMBER OF APPLICANTS. Please email us well in advance if you require a letter of invitation for visa
-                    purposes and make sure you complete all travel formalities in good time (visa applications, travel
-                    permits, leaves, etc.) No Refunds will be granted in case any candidate fails to get the visa prior
-                    to the exam date. Candidates with a disability are requested to read the rules and regulation
-                    document [Page 10] available on the website The MRCGP [INT.] South Asia Secretariat will notify you
-                    by email of your allocated date and time at least two weeks before the exam starting date.
+                    THE NUMBER OF PLACES IS LIMITED, AND SLOTS WILL BE ALLOCATED
+                    ON THE "FIRST COME FIRST SERVED” BASIS. Your application may
+                    be rejected because of a large number of applicants and you
+                    may be invited to apply again or offered a slot at a
+                    subsequent examination. Priority will be given to applicants
+                    from South Asia and those applications that reach us first,
+                    so we encourage you to apply as soon as possible. WHILST WE
+                    WILL TRY TO ACCOMMODATE YOUR PREFERENCE, IT MAY NOT BE
+                    POSSIBLE DUE TO A LARGE NUMBER OF APPLICANTS. Please email
+                    us well in advance if you require a letter of invitation for
+                    visa purposes and make sure you complete all travel
+                    formalities in good time (visa applications, travel permits,
+                    leaves, etc.) No Refunds will be granted in case any
+                    candidate fails to get the visa prior to the exam date.
+                    Candidates with a disability are requested to read the rules
+                    and regulation document [Page 10] available on the website
+                    The MRCGP [INT.] South Asia Secretariat will notify you by
+                    email of your allocated date and time at least two weeks
+                    before the exam starting date.
                   </Text>
                 </View>
               </View>
             </View>
             <View style={styles.resumeSection}>
               <View style={styles.resumeHeader}>
-                <Text style={styles.resumeSectionTitle}>CANDIDATE'S STATEMENT</Text>
+                <Text style={styles.resumeSectionTitle}>
+                  CANDIDATE'S STATEMENT
+                </Text>
               </View>
               <View style={styles.resumeBody}>
                 <View style={styles.fieldRow}>
                   <Text style={styles.note}>
-                    I hereby apply to sit the South Asia MRCGP [INT.] Part 2 (OSCE) Examination, success in which will
-                    allow me to apply for International Membership of the UK's Royal College of General Practitioners.
-                    Detailed information on the membership application process can be found on the RCGP website: Member
-                    Ship I have read and agree to abide by the conditions set out in the South Asia MRCGP [INT.]
-                    Examination Rules and Regulations as published on the MRCGP [INT.] South Asia website:
-                    www.mrcgpintsouthasia.org If accepted for International Membership, I undertake to continue approved
-                    postgraduate study while I remain in active general practice/family practice, and to uphold and
-                    promote the aims of the RCGP to the best of my ability. I understand that, on being accepted for
-                    International Membership, an annual subscription fee is to be payable to the RCGP. I understand that
-                    only registered International Members who maintain their RCGP subscription are entitled to use the
-                    post-nominal designation "MRCGP [INT]". Success in the exam does not give me the right to refer to
-                    myself as MRCGP [INT.]. I attach a banker's draft made payable to “MRCGP [INT.] South Asia”, I also
-                    understand and agree that my personal data will be handled by the MRCGP [INT.] South Asia Board and
-                    I also give permission for my personal data to be handled by the regional MRCGP [INT.] South Asia
+                    I hereby apply to sit the South Asia MRCGP [INT.] Part 2
+                    (OSCE) Examination, success in which will allow me to apply
+                    for International Membership of the UK's Royal College of
+                    General Practitioners. Detailed information on the
+                    membership application process can be found on the RCGP
+                    website: Member Ship I have read and agree to abide by the
+                    conditions set out in the South Asia MRCGP [INT.]
+                    Examination Rules and Regulations as published on the MRCGP
+                    [INT.] South Asia website: www.mrcgpintsouthasia.org If
+                    accepted for International Membership, I undertake to
+                    continue approved postgraduate study while I remain in
+                    active general practice/family practice, and to uphold and
+                    promote the aims of the RCGP to the best of my ability. I
+                    understand that, on being accepted for International
+                    Membership, an annual subscription fee is to be payable to
+                    the RCGP. I understand that only registered International
+                    Members who maintain their RCGP subscription are entitled to
+                    use the post-nominal designation "MRCGP [INT]". Success in
+                    the exam does not give me the right to refer to myself as
+                    MRCGP [INT.]. I attach a banker's draft made payable to
+                    “MRCGP [INT.] South Asia”, I also understand and agree that
+                    my personal data will be handled by the MRCGP [INT.] South
+                    Asia Board and I also give permission for my personal data
+                    to be handled by the regional MRCGP [INT.] South Asia
                     co-ordinators..
                   </Text>
                 </View>
@@ -458,7 +586,10 @@ export function ApplicationForm() {
           <Page size="A4" style={styles.page}>
             <View style={styles.documentPage}>
               <Text style={styles.documentPageTitle}>Medical License</Text>
-              <Image src={images.medicalLicense || "/placeholder.svg"} style={styles.documentPageImage} />
+              <Image
+                src={images.medicalLicense || "/placeholder.svg"}
+                style={styles.documentPageImage}
+              />
               <View style={styles.documentPageFooter}>
                 <Text style={styles.documentPageFooterText}>
                   {data.fullName} - Candidate ID: {data.candidateId}
@@ -472,7 +603,10 @@ export function ApplicationForm() {
           <Page size="A4" style={styles.page}>
             <View style={styles.documentPage}>
               <Text style={styles.documentPageTitle}>Part 1 Passing Email</Text>
-              <Image src={images.part1Email || "/placeholder.svg"} style={styles.documentPageImage} />
+              <Image
+                src={images.part1Email || "/placeholder.svg"}
+                style={styles.documentPageImage}
+              />
               <View style={styles.documentPageFooter}>
                 <Text style={styles.documentPageFooterText}>
                   {data.fullName} - Candidate ID: {data.candidateId}
@@ -486,7 +620,10 @@ export function ApplicationForm() {
           <Page size="A4" style={styles.page}>
             <View style={styles.documentPage}>
               <Text style={styles.documentPageTitle}>Passport Bio Page</Text>
-              <Image src={images.passportBio || "/placeholder.svg"} style={styles.documentPageImage} />
+              <Image
+                src={images.passportBio || "/placeholder.svg"}
+                style={styles.documentPageImage}
+              />
               <View style={styles.documentPageFooter}>
                 <Text style={styles.documentPageFooterText}>
                   {data.fullName} - Candidate ID: {data.candidateId}
@@ -500,7 +637,10 @@ export function ApplicationForm() {
           <Page size="A4" style={styles.page}>
             <View style={styles.documentPage}>
               <Text style={styles.documentPageTitle}>Signature</Text>
-              <Image src={images.signature || "/placeholder.svg"} style={styles.documentPageImage} />
+              <Image
+                src={images.signature || "/placeholder.svg"}
+                style={styles.documentPageImage}
+              />
               <View style={styles.documentPageFooter}>
                 <Text style={styles.documentPageFooterText}>
                   {data.fullName} - Candidate ID: {data.candidateId}
@@ -510,8 +650,8 @@ export function ApplicationForm() {
           </Page>
         )}
       </Document>
-    )
-  }
+    );
+  };
 
   // PDF Styles
   const styles = StyleSheet.create({
@@ -663,13 +803,7 @@ export function ApplicationForm() {
       fontSize: 10,
       color: "#6b7280",
     },
-  })
-
-  // Prepare PDF data
-  const pdfData = useMemo(() => {
-    return form.getValues()
-  }, [form, previewMode]);
-  console.log(pdfData, "pdfData")
+  });
 
   // Prepare images for PDF
   const pdfImages = useMemo(() => {
@@ -679,53 +813,54 @@ export function ApplicationForm() {
       part1Email: part1EmailPreview,
       passportBio: passportBioPreview,
       signature: signaturePreview,
-    }
-  }, [passportPreview, medicalLicensePreview, part1EmailPreview, passportBioPreview, signaturePreview])
+    };
+  }, [
+    passportPreview,
+    medicalLicensePreview,
+    part1EmailPreview,
+    passportBioPreview,
+    signaturePreview,
+  ]);
 
   useEffect(() => {
     if (selectedExam && new Date(selectedExam.closingDate) < new Date()) {
-      setIsExamClosed(true)
+      setIsExamClosed(true);
     } else {
-      setIsExamClosed(false)
+      setIsExamClosed(false);
     }
     if (selectedExam && selectedExam.isBlocked === true) {
-      setIsClosed(true)
+      setIsClosed(true);
     } else {
-      setIsClosed(false)
+      setIsClosed(false);
     }
-  }, [selectedExam])
-
-  console.log(isExamClosed, "isExamClosed")
-  console.log(warning, "warning");
-
+  }, [selectedExam]);
 
   async function onSubmit(data: FormValues) {
-
     // Validate phone numbers
-    const phoneRegex = /^\+?[1-9]\d{1,14}$/
+    const phoneRegex = /^\+?[1-9]\d{1,14}$/;
 
-    if (!phoneRegex.test(data.whatsapp)) {
+    if (!data.whatsapp || data.whatsapp.length < 8) {
       form.setError("whatsapp", {
         type: "manual",
         message: "Please enter a valid phone number",
-      })
-      setIsSubmitting(false)
-      return
+      });
+      setIsSubmitting(false);
+      return;
     }
 
     if (!phoneRegex.test(data.emergencyContact)) {
       form.setError("emergencyContact", {
         type: "manual",
         message: "Please enter a valid phone number",
-      })
-      setIsSubmitting(false)
-      return
+      });
+      setIsSubmitting(false);
+      return;
     }
 
     if (!params.examId || !selectedExam) {
-      alert("Exam ID is missing or invalid. Please try again.")
-      setIsSubmitting(false)
-      return
+      alert("Exam ID is missing or invalid. Please try again.");
+      setIsSubmitting(false);
+      return;
     }
 
     if (
@@ -738,13 +873,15 @@ export function ApplicationForm() {
     } else {
       setWarning(false);
     }
-    
-    setIsSubmitting(true)
-    
-    const isPendingAvailable = selectedExam.receivingApplicationsCount < selectedExam.applicationsLimit
+
+    setIsSubmitting(true);
+
+    const isPendingAvailable =
+      selectedExam.receivingApplicationsCount < selectedExam.applicationsLimit;
 
     const isWaitingAvailable =
-      selectedExam.receivingApplicationsCount < selectedExam.applicationsLimit + selectedExam.waitingLimit
+      selectedExam.receivingApplicationsCount <
+      selectedExam.applicationsLimit + selectedExam.waitingLimit;
 
     const application = {
       ...data,
@@ -762,16 +899,18 @@ export function ApplicationForm() {
       pdfUrl: "",
       date: new Date().toISOString(), // Add the missing 'date' property
       name: data.fullName, // Add the missing 'name' property
-      dateOfRegistration: data.dateOfRegistration ? data.dateOfRegistration.toISOString() : "", // Convert to string
+      dateOfRegistration: data.dateOfRegistration
+        ? data.dateOfRegistration.toISOString()
+        : "", // Convert to string
       preferenceDate1: data.preferenceDate1 || "", // Ensure string type
       preferenceDate2: data.preferenceDate2 || "", // Ensure string type
       preferenceDate3: data.preferenceDate3 || "", // Ensure string type
-    }
+    };
 
     if (isPendingAvailable) {
-      application.status = "pending"
-      dispatch(addApplication(application))
-      dispatch(incrementApplicationsCount(params.examId))
+      application.status = "pending";
+      dispatch(addApplication(application));
+      dispatch(incrementApplicationsCount(params.examId));
       Swal.fire({
         title: "Success!",
         text: "Form submitted successfully!",
@@ -782,18 +921,16 @@ export function ApplicationForm() {
         confirmButtonColor: "#6366f1",
       }).then((result) => {
         if (result.isConfirmed) {
-          document.getElementById("pdf-download-link")?.click()
-            setTimeout(() => {
-            window.location.reload()
-            }, 10000)
+          document.getElementById("pdf-download-link")?.click();
+          setTimeout(() => {
+            window.location.reload();
+          }, 10000);
         }
       });
-      
-      
     } else if (isWaitingAvailable) {
-      application.status = "waiting"
-      dispatch(addApplication(application))
-      dispatch(incrementApplicationsCount(params.examId))
+      application.status = "waiting";
+      dispatch(addApplication(application));
+      dispatch(incrementApplicationsCount(params.examId));
       Swal.fire({
         title: "Success!",
         text: "Form submitted successfully! (Added to waiting list)",
@@ -804,172 +941,178 @@ export function ApplicationForm() {
         confirmButtonColor: "#6366f1",
       }).then((result) => {
         if (result.isConfirmed) {
-          document.getElementById("pdf-download-link")?.click()
+          document.getElementById("pdf-download-link")?.click();
           setTimeout(() => {
-            window.location.reload()
-            }, 10000)
+            window.location.reload();
+          }, 10000);
         }
-      })
-      }
-     else {
-      dispatch(toggleBlockExam(params.examId))
+      });
+    } else {
+      dispatch(toggleBlockExam(params.examId));
       Swal.fire({
         title: "Error",
         text: "No more slots available for this exam.",
         icon: "error",
         confirmButtonColor: "#6366f1",
-        
-      })
-      
+      });
     }
-
-    // document.getElementById("preview-button")?.click()
-  
-    setIsSubmitting(false)
+    setIsSubmitting(false);
   }
 
   const validateFile = async (file: File, inputId: string) => {
     // List of input IDs that require validation
-    const validateThese = ["passport-image"]
-  
+    const validateThese = ["passport-image"];
+
     // Reset error
-    setFileError(null)
-  
+    setFileError(null);
+
     // Only validate if inputId is in the validation list
     if (validateThese.includes(inputId)) {
       // Check file type
-      const validTypes = ["image/jpeg", "image/jpg", "image/png"]
+      const validTypes = ["image/jpeg", "image/jpg", "image/png"];
       if (!validTypes.includes(file.type)) {
-        setFileError(`Invalid file format. Only PNG and JPG formats are supported.`)
-        const fileInput = document.getElementById(inputId) as HTMLInputElement
-        if (fileInput) fileInput.value = ""
-        return false
+        setFileError(
+          `Invalid file format. Only PNG and JPG formats are supported.`
+        );
+        const fileInput = document.getElementById(inputId) as HTMLInputElement;
+        if (fileInput) fileInput.value = "";
+        return false;
       }
-  
+
       // Check file size (2MB = 2 * 1024 * 1024 bytes)
-      const maxSize = 2 * 1024 * 1024
+      const maxSize = 2 * 1024 * 1024;
       if (file.size > maxSize) {
-        setFileError(`File size exceeds 2MB limit. Please choose a smaller file.`)
-        const fileInput = document.getElementById(inputId) as HTMLInputElement
-        if (fileInput) fileInput.value = ""
-        return false
+        setFileError(
+          `File size exceeds 2MB limit. Please choose a smaller file.`
+        );
+        const fileInput = document.getElementById(inputId) as HTMLInputElement;
+        if (fileInput) fileInput.value = "";
+        return false;
       }
     }
-  
+
     // Upload to Supabase
-    const fileName = `${inputId}/${Date.now()}_${file.name}`
-    const { error } = await supabase.storage.from("restaurant-images").upload(fileName, file)
-  
+    const fileName = `${inputId}/${Date.now()}_${file.name}`;
+    const { error } = await supabase.storage
+      .from("restaurant-images")
+      .upload(fileName, file);
+
     if (error) {
-      setFileError("Upload failed. Please try again.")
-      return false
+      setFileError("Upload failed. Please try again.");
+      return false;
     }
-  
+
     // Get public URL
-    const { data: publicUrlData } = supabase.storage.from("restaurant-images").getPublicUrl(fileName)
-    const publicUrl = publicUrlData?.publicUrl
-    console.log(publicUrl, "publicurl")
-  
+    const { data: publicUrlData } = supabase.storage
+      .from("restaurant-images")
+      .getPublicUrl(fileName);
+    const publicUrl = publicUrlData?.publicUrl;
+
     if (!publicUrl) {
-      setFileError("Could not retrieve image URL.")
-      return false
+      setFileError("Could not retrieve image URL.");
+      return false;
     }
-  
+
     // Set image URL in preview state
     switch (inputId) {
       case "passport-image":
-        setPassportPreview(publicUrl)
-        break
+        setPassportPreview(publicUrl);
+        break;
       case "medical-license":
-        setMedicalLicensePreview(publicUrl)
-        break
+        setMedicalLicensePreview(publicUrl);
+        break;
       case "part1-email":
-        setPart1EmailPreview(publicUrl)
-        break
+        setPart1EmailPreview(publicUrl);
+        break;
       case "passport-bio":
-        setPassportBioPreview(publicUrl)
-        break
+        setPassportBioPreview(publicUrl);
+        break;
       case "signature":
-        setSignaturePreview(publicUrl)
-        break
+        setSignaturePreview(publicUrl);
+        break;
     }
-  
-    return true
-  }
-  
 
-  console.log({
+    return true;
+  };
+
+  useEffect(() => {
+    // Cleanup function to revoke object URLs when component unmounts
+    return () => {
+      if (passportPreview) URL.revokeObjectURL(passportPreview);
+      if (medicalLicensePreview) URL.revokeObjectURL(medicalLicensePreview);
+      if (part1EmailPreview) URL.revokeObjectURL(part1EmailPreview);
+      if (passportBioPreview) URL.revokeObjectURL(passportBioPreview);
+      if (signaturePreview) URL.revokeObjectURL(signaturePreview);
+    };
+  }, [
     passportPreview,
     medicalLicensePreview,
     part1EmailPreview,
     passportBioPreview,
     signaturePreview,
-  })
-
-  console.log(selectedDates, "selecteddates")
-
-  useEffect(() => {
-    // Cleanup function to revoke object URLs when component unmounts
-    return () => {
-      if (passportPreview) URL.revokeObjectURL(passportPreview)
-      if (medicalLicensePreview) URL.revokeObjectURL(medicalLicensePreview)
-      if (part1EmailPreview) URL.revokeObjectURL(part1EmailPreview)
-      if (passportBioPreview) URL.revokeObjectURL(passportBioPreview)
-      if (signaturePreview) URL.revokeObjectURL(signaturePreview)
-    }
-  }, [passportPreview, medicalLicensePreview, part1EmailPreview, passportBioPreview, signaturePreview])
+  ]);
 
   // Parse slot dates when selectedExam changes
   useEffect(() => {
     if (selectedExam && selectedExam.slot1) {
-      const slot1Dates = parseSlotDates(selectedExam.slot1)
-      const slot2Dates = parseSlotDates(selectedExam.slot2)
-      const slot3Dates = parseSlotDates(selectedExam.slot3)
+      const slot1Dates = parseSlotDates(selectedExam.slot1);
+      const slot2Dates = parseSlotDates(selectedExam.slot2);
+      const slot3Dates = parseSlotDates(selectedExam.slot3);
 
       // Combine all dates and remove duplicates
-      const allDates = [...slot1Dates, ...slot2Dates, ...slot3Dates]
+      const allDates = [...slot1Dates, ...slot2Dates, ...slot3Dates];
       const uniqueDatesStr = [
         ...new Set(
-          allDates.filter((date) => date instanceof Date && !isNaN(date.getTime())).map((date) => date.toISOString()),
+          allDates
+            .filter((date) => date instanceof Date && !isNaN(date.getTime()))
+            .map((date) => date.toISOString())
         ),
-      ]
-      const uniqueDates = uniqueDatesStr.map((dateStr) => new Date(dateStr))
+      ];
+      const uniqueDates = uniqueDatesStr.map((dateStr) => new Date(dateStr));
 
       // Sort dates in ascending order
-      uniqueDates.sort((a, b) => a.getTime() - b.getTime())
+      uniqueDates.sort((a, b) => a.getTime() - b.getTime());
 
-      setAvailableDates(uniqueDates)
+      setAvailableDates(uniqueDates);
     }
-  }, [selectedExam])
+  }, [selectedExam]);
 
   // Update selected dates when form values change
   useEffect(() => {
     const subscription = form.watch((value) => {
       setSelectedDates({
-        preferenceDate1: value.preferenceDate1 ? new Date(value.preferenceDate1).toISOString() : null,
-        preferenceDate2: value.preferenceDate2 ? new Date(value.preferenceDate2).toISOString() : null,
-        preferenceDate3: value.preferenceDate3 ? new Date(value.preferenceDate3).toISOString() : null,
-      })
-    })
+        preferenceDate1: value.preferenceDate1
+          ? new Date(value.preferenceDate1)?.toISOString()
+          : null,
+        preferenceDate2: value.preferenceDate2
+          ? new Date(value.preferenceDate2)?.toISOString()
+          : null,
+        preferenceDate3: value.preferenceDate3
+          ? new Date(value.preferenceDate3)?.toISOString()
+          : null,
+      });
+    });
 
-    return () => subscription.unsubscribe()
-  }, [form.watch])
+    return () => subscription.unsubscribe();
+  }, [form.watch]);
 
   // Get available dates for a specific field (excluding dates selected in other fields)
-  const getAvailableDatesForField = (fieldName: "preferenceDate1" | "preferenceDate2" | "preferenceDate3") => {
+  const getAvailableDatesForField = (
+    fieldName: "preferenceDate1" | "preferenceDate2" | "preferenceDate3"
+  ) => {
     return availableDates.filter((date) => {
-      const dateStr = date.toISOString()
+      const dateStr = date.toISOString();
 
       // Check if this date is selected in another field
       for (const [field, selectedDate] of Object.entries(selectedDates)) {
         if (field !== fieldName && selectedDate === dateStr) {
-          return false
+          return false;
         }
       }
 
-      return true
-    })
-  }
+      return true;
+    });
+  };
 
   const candidateId = form.watch("candidateId");
 
@@ -978,16 +1121,26 @@ export function ApplicationForm() {
       form.setValue("candidateId", "");
     }
   }, [candidateId]);
-  
 
+  const [phone, setPhone] = useState<string | undefined>();
+  const [error, setError] = useState<string | null>(null);
+
+  const handleBlur = () => {
+    if (!phone) {
+      setError("Phone number is required");
+    } else if (!isValidPhoneNumber(phone)) {
+      setError("Invalid phone number");
+    } else {
+      setError(null);
+    }
+  };
 
   if (isExamClosed) {
-    return <ExamClosed />
+    return <ExamClosed />;
   }
   if (isClosed) {
-    return <ExamClosedApp />
+    return <ExamClosedApp />;
   }
-  
 
   return (
     <div className="container mx-auto py-8 px-4 max-w-5xl">
@@ -1007,7 +1160,9 @@ export function ApplicationForm() {
               </CardDescription>
             </CardTitle>
             <div className="px-4 py-2 bg-indigo-100 dark:bg-indigo-900/30 rounded-md text-indigo-700 dark:text-indigo-300 font-medium text-sm">
-              {selectedExam ? selectedExam.name + " - " + selectedExam.location : ""}
+              {selectedExam
+                ? selectedExam.name + " - " + selectedExam.location
+                : ""}
             </div>
           </div>
         </CardHeader>
@@ -1016,7 +1171,12 @@ export function ApplicationForm() {
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
               {/* Personal and Contact Information */}
-              <Accordion type="single" collapsible defaultValue="personal" className="w-full">
+              <Accordion
+                type="single"
+                collapsible
+                defaultValue="personal"
+                className="w-full"
+              >
                 <AccordionItem
                   value="personal"
                   className="border dark:border-slate-700 rounded-lg overflow-hidden shadow-sm"
@@ -1036,13 +1196,23 @@ export function ApplicationForm() {
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel className="text-base font-medium">
-                              Candidate ID <span className="text-red-500">*</span>
+                              Candidate ID{" "}
+                              <span className="text-red-500">*</span>
                             </FormLabel>
-                            <FormDescription>Please quote it in all correspondence.</FormDescription>
+                            <FormDescription>
+                              Please quote it in all correspondence.
+                            </FormDescription>
                             <FormControl>
                               <Input
                                 placeholder="e.g. 1234567"
                                 {...field}
+                                maxLength={7}
+                                onChange={(e) => {
+                                  const value = e.target.value;
+                                  if (value.length <= 7) {
+                                    field.onChange(value);
+                                  }
+                                }}
                                 className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus-visible:ring-indigo-500"
                               />
                             </FormControl>
@@ -1050,11 +1220,12 @@ export function ApplicationForm() {
                           </FormItem>
                         )}
                       />
-                      
 
                       {/* Passport Image */}
                       <div className="space-y-2">
-                        <FormLabel className="text-base font-medium">Passport Size image:</FormLabel>
+                        <FormLabel className="text-base font-medium">
+                          Passport Size image:
+                        </FormLabel>
                         <div className="flex items-center justify-center w-full">
                           {passportPreview ? (
                             <div className="relative w-full">
@@ -1069,9 +1240,11 @@ export function ApplicationForm() {
                                   variant="outline"
                                   size="sm"
                                   onClick={() => {
-                                    setPassportPreview(null)
-                                    const fileInput = document.getElementById("passport-image") as HTMLInputElement
-                                    if (fileInput) fileInput.value = ""
+                                    setPassportPreview(null);
+                                    const fileInput = document.getElementById(
+                                      "passport-image"
+                                    ) as HTMLInputElement;
+                                    if (fileInput) fileInput.value = "";
                                   }}
                                   className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700"
                                 >
@@ -1087,9 +1260,14 @@ export function ApplicationForm() {
                               <div className="flex flex-col items-center justify-center pt-5 pb-6">
                                 <Upload className="w-8 h-8 mb-2 text-slate-500 dark:text-slate-400" />
                                 <p className="mb-2 text-sm text-slate-500 dark:text-slate-400">
-                                  <span className="font-semibold">Click to upload</span> or drag and drop
+                                  <span className="font-semibold">
+                                    Click to upload
+                                  </span>{" "}
+                                  or drag and drop
                                 </p>
-                                <p className="text-xs text-slate-500 dark:text-slate-400">PNG, JPG (MAX. 2MB)</p>
+                                <p className="text-xs text-slate-500 dark:text-slate-400">
+                                  PNG, JPG (MAX. 2MB)
+                                </p>
                               </div>
                               <input
                                 id="passport-image"
@@ -1098,14 +1276,21 @@ export function ApplicationForm() {
                                 accept="image/png, image/jpeg, image/jpg"
                                 onChange={(e) => {
                                   if (e.target.files && e.target.files[0]) {
-                                    validateFile(e.target.files[0], "passport-image")
+                                    validateFile(
+                                      e.target.files[0],
+                                      "passport-image"
+                                    );
                                   }
                                 }}
                               />
                             </label>
                           )}
                         </div>
-                        {fileError && <p className="text-sm text-red-500 mt-1">{fileError}</p>}
+                        {fileError && (
+                          <p className="text-sm text-red-500 mt-1">
+                            {fileError}
+                          </p>
+                        )}
                       </div>
 
                       {/* Full Name */}
@@ -1115,7 +1300,8 @@ export function ApplicationForm() {
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel className="text-base font-medium">
-                              Full name as you would like it to appear on record <span className="text-red-500">*</span>
+                              Full name as you would like it to appear on record{" "}
+                              <span className="text-red-500">*</span>
                             </FormLabel>
                             <FormControl>
                               <Input
@@ -1131,7 +1317,9 @@ export function ApplicationForm() {
 
                       {/* Residential Address */}
                       <div className="space-y-4">
-                        <h3 className="text-base font-medium">Residential Address</h3>
+                        <h3 className="text-base font-medium">
+                          Residential Address
+                        </h3>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <FormField
@@ -1139,7 +1327,10 @@ export function ApplicationForm() {
                             name="poBox"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>House no. and street or P.O.Box: <span className="text-red-500">*</span></FormLabel>
+                                <FormLabel>
+                                  House no. and street or P.O.Box:{" "}
+                                  <span className="text-red-500">*</span>
+                                </FormLabel>
                                 <FormControl>
                                   <Input
                                     placeholder="Enter P.O.Box"
@@ -1157,7 +1348,10 @@ export function ApplicationForm() {
                             name="district"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>District: <span className="text-red-500">*</span></FormLabel>
+                                <FormLabel>
+                                  District:{" "}
+                                  <span className="text-red-500">*</span>
+                                </FormLabel>
                                 <FormControl>
                                   <Input
                                     placeholder="Enter District"
@@ -1175,7 +1369,10 @@ export function ApplicationForm() {
                             name="city"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>City / Town / Village: <span className="text-red-500">*</span></FormLabel>
+                                <FormLabel>
+                                  City / Town / Village:{" "}
+                                  <span className="text-red-500">*</span>
+                                </FormLabel>
                                 <FormControl>
                                   <Input
                                     placeholder="Enter City / Town / Village"
@@ -1193,7 +1390,10 @@ export function ApplicationForm() {
                             name="province"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>Province / Region: <span className="text-red-500">*</span></FormLabel>
+                                <FormLabel>
+                                  Province / Region:{" "}
+                                  <span className="text-red-500">*</span>
+                                </FormLabel>
                                 <FormControl>
                                   <Input
                                     placeholder="Enter Province / Region"
@@ -1211,7 +1411,10 @@ export function ApplicationForm() {
                             name="country"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>Country: <span className="text-red-500">*</span></FormLabel>
+                                <FormLabel>
+                                  Country:{" "}
+                                  <span className="text-red-500">*</span>
+                                </FormLabel>
                                 <FormControl>
                                   <Input
                                     placeholder="Enter Country"
@@ -1228,157 +1431,199 @@ export function ApplicationForm() {
 
                       {/* Contact Details */}
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <FormField
-                            control={form.control}
-                            name="whatsapp"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>
-                                  WhatsApp number: <span className="text-red-500">*</span>
-                                </FormLabel>
-                                {/* <FormDescription>In full international format</FormDescription> */}
-                                <FormControl>
-                                  <div className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2">
-                                    <PhoneInput
-                                      international
-                                      // countryCallingCodeEditable={false}
-                                      defaultCountry="PK"
-                                      value={field.value}
-                                      onChange={field.onChange}
-                                      className="flex h-10 w-full rounded-md bg-transparent px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-                                    />
-                                  </div>
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <FormField
+                          control={form.control}
+                          name="whatsapp"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>
+                                WhatsApp number:{" "}
+                                <span className="text-red-500">*</span>
+                              </FormLabel>
+                              {/* <FormDescription>In full international format</FormDescription> */}
+                              <FormControl>
+                                <div className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2">
+                                  <PhoneInput
+                                    international
+                                    countryCallingCodeEditable={true}
+                                    value={field.value}
+                                    onBlur={handleBlur}
+                                    onChange={(value) => {
+                                      field.onChange(value);
+                                      setPhone(value);
+                                    }}
+                                    className="flex h-10 w-full rounded-md bg-transparent px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                                  />
+                                </div>
+                              </FormControl>
+                              <FormMessage>
+                                {error && (
+                                  <span className="text-sm text-red-500">
+                                    {error}
+                                  </span>
+                                )}
+                              </FormMessage>
+                            </FormItem>
+                          )}
+                        />
 
-                          <FormField
-                            control={form.control}
-                            name="emergencyContact"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>
-                                  Emergency contact number <span className="text-red-500">*</span>
-                                </FormLabel>
-                                {/* <FormDescription>In full international format</FormDescription> */}
-                                <FormControl>
-                                  <div className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2">
-                                    <PhoneInput
-                                      international
-                                      // countryCallingCodeEditable={false}
-                                      defaultCountry="PK"
-                                      value={field.value}
-                                      onChange={field.onChange}
-                                      className="flex h-10 w-full rounded-md bg-transparent px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-                                    />
-                                  </div>
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
+                        <FormField
+                          control={form.control}
+                          name="emergencyContact"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>
+                                Emergency contact number{" "}
+                                <span className="text-red-500">*</span>
+                              </FormLabel>
+                              {/* <FormDescription>In full international format</FormDescription> */}
+                              <FormControl>
+                                <div className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2">
+                                  <PhoneInput
+                                    international
+                                    countryCallingCodeEditable={true}
+                                    value={field.value}
+                                    onBlur={handleBlur}
+                                    onChange={(value) => {
+                                      field.onChange(value);
+                                      setPhone(value);
+                                    }}
+                                    className="flex h-10 w-full rounded-md bg-transparent px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                                  />
+                                </div>
+                              </FormControl>
+                              <FormMessage>
+                                {error && (
+                                  <span className="text-sm text-red-500">
+                                    {error}
+                                  </span>
+                                )}
+                              </FormMessage>
+                            </FormItem>
+                          )}
+                        />
 
-                          <FormField
-                            control={form.control}
-                            name="email"
-                            render={({ field }) => (
-                              <FormItem className="col-span-1 md:col-span-2">
-                                <FormLabel>
-                                  E-mail <span className="text-red-500">*</span>
-                                </FormLabel>
-                                {/* <FormDescription>
+                        <FormField
+                          control={form.control}
+                          name="email"
+                          render={({ field }) => (
+                            <FormItem className="col-span-1 md:col-span-2">
+                              <FormLabel>
+                                E-mail <span className="text-red-500">*</span>
+                              </FormLabel>
+                              {/* <FormDescription>
                                   Please provide valid personal email address that you regularly check, as most
                                   correspondence and important announcements are communicated to candidates by email.
                                 </FormDescription> */}
-                                <FormControl>
-                                  <Input
-                                    placeholder="Enter Email"
-                                    type="email"
-                                    {...field}
-                                    className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus-visible:ring-indigo-500"
-                                  />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          {/* Date of passing Part 1 exam */}
-                          <FormField
-                            control={form.control}
-                            name="dateOfPassingPart1"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>
-                                  Date of passing Part 1 exam <span className="text-red-500">*</span>
-                                </FormLabel>
-                                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                  <FormControl>
-                                    <SelectTrigger className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus-visible:ring-indigo-500">
-                                      <SelectValue placeholder="Select date" />
-                                    </SelectTrigger>
-                                  </FormControl>
-                                  <SelectContent className="dark:bg-slate-800 dark:border-slate-700">
-                                    {part1ExamDates.map((date) => (
-                                      <SelectItem
-                                        key={date}
-                                        value={date}
-                                        className="dark:text-slate-200 dark:focus:bg-slate-700"
-                                      >
-                                        {date}
-                                      </SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-
-                          {/* No. of previous OSCE attempts */}
-                          <FormField
-                            control={form.control}
-                            name="previousOsceAttempts"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>
-                                  No. of previous OSCE attempts <span className="text-red-500">*</span>
-                                </FormLabel>
-                                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                  <FormControl>
-                                    <SelectTrigger className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus-visible:ring-indigo-500">
-                                      <SelectValue placeholder="Select number" />
-                                    </SelectTrigger>
-                                  </FormControl>
-                                  <SelectContent className="dark:bg-slate-800 dark:border-slate-700">
-                                    <SelectItem value="0" className="dark:text-slate-200 dark:focus:bg-slate-700">
-                                      0
-                                    </SelectItem>
-                                    <SelectItem value="1" className="dark:text-slate-200 dark:focus:bg-slate-700">
-                                      1
-                                    </SelectItem>
-                                    <SelectItem value="2" className="dark:text-slate-200 dark:focus:bg-slate-700">
-                                      2
-                                    </SelectItem>
-                                  </SelectContent>
-                                </Select>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                        </div>
+                              <FormControl>
+                                <Input
+                                  placeholder="Enter Email"
+                                  type="email"
+                                  {...field}
+                                  className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus-visible:ring-indigo-500"
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
                       </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {/* Date of passing Part 1 exam */}
+                        <FormField
+                          control={form.control}
+                          name="dateOfPassingPart1"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>
+                                Date of passing Part 1 exam{" "}
+                                <span className="text-red-500">*</span>
+                              </FormLabel>
+                              <Select
+                                onValueChange={field.onChange}
+                                defaultValue={field.value}
+                              >
+                                <FormControl>
+                                  <SelectTrigger className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus-visible:ring-indigo-500">
+                                    <SelectValue placeholder="Select date" />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent className="dark:bg-slate-800 dark:border-slate-700">
+                                  {part1ExamDates.map((date) => (
+                                    <SelectItem
+                                      key={date}
+                                      value={date}
+                                      className="dark:text-slate-200 dark:focus:bg-slate-700"
+                                    >
+                                      {date}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        {/* No. of previous OSCE attempts */}
+                        <FormField
+                          control={form.control}
+                          name="previousOsceAttempts"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>
+                                No. of previous OSCE attempts{" "}
+                                <span className="text-red-500">*</span>
+                              </FormLabel>
+                              <Select
+                                onValueChange={field.onChange}
+                                defaultValue={field.value}
+                              >
+                                <FormControl>
+                                  <SelectTrigger className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus-visible:ring-indigo-500">
+                                    <SelectValue placeholder="Select number" />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent className="dark:bg-slate-800 dark:border-slate-700">
+                                  <SelectItem
+                                    value="0"
+                                    className="dark:text-slate-200 dark:focus:bg-slate-700"
+                                  >
+                                    0
+                                  </SelectItem>
+                                  <SelectItem
+                                    value="1"
+                                    className="dark:text-slate-200 dark:focus:bg-slate-700"
+                                  >
+                                    1
+                                  </SelectItem>
+                                  <SelectItem
+                                    value="2"
+                                    className="dark:text-slate-200 dark:focus:bg-slate-700"
+                                  >
+                                    2
+                                  </SelectItem>
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    </div>
                   </AccordionContent>
                 </AccordionItem>
               </Accordion>
 
               {/* Experience and License Details */}
-              <Accordion type="single" collapsible defaultValue="experience" className="w-full">
+              <Accordion
+                type="single"
+                collapsible
+                defaultValue="experience"
+                className="w-full"
+              >
                 <AccordionItem
                   value="experience"
                   className="border dark:border-slate-700 rounded-lg overflow-hidden shadow-sm"
@@ -1398,7 +1643,8 @@ export function ApplicationForm() {
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel>
-                                Country of postgraduate clinical experience: <span className="text-red-500">*</span>
+                                Country of postgraduate clinical experience:{" "}
+                                <span className="text-red-500">*</span>
                               </FormLabel>
                               <FormControl>
                                 <Input
@@ -1418,7 +1664,8 @@ export function ApplicationForm() {
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel>
-                                Country of ethnic origin <span className="text-red-500">*</span>
+                                Country of ethnic origin{" "}
+                                <span className="text-red-500">*</span>
                               </FormLabel>
                               <FormControl>
                                 <Input
@@ -1438,7 +1685,8 @@ export function ApplicationForm() {
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel>
-                                Registration authority <span className="text-red-500">*</span>
+                                Registration authority{" "}
+                                <span className="text-red-500">*</span>
                               </FormLabel>
                               <FormControl>
                                 <Input
@@ -1458,7 +1706,8 @@ export function ApplicationForm() {
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel>
-                                Registration number <span className="text-red-500">*</span>
+                                Registration number{" "}
+                                <span className="text-red-500">*</span>
                               </FormLabel>
                               <FormControl>
                                 <Input
@@ -1478,7 +1727,8 @@ export function ApplicationForm() {
                           render={({ field }) => (
                             <FormItem className="flex flex-col">
                               <FormLabel>
-                                Date of full registration <span className="text-red-500">*</span>
+                                Date of full registration{" "}
+                                <span className="text-red-500">*</span>
                               </FormLabel>
                               <Popover>
                                 <PopoverTrigger asChild>
@@ -1487,10 +1737,14 @@ export function ApplicationForm() {
                                       variant={"outline"}
                                       className={cn(
                                         "w-full pl-3 text-left font-normal bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus-visible:ring-indigo-500",
-                                        !field.value && "text-muted-foreground",
+                                        !field.value && "text-muted-foreground"
                                       )}
                                     >
-                                      {field.value ? format(field.value, "PPP") : <span>dd/mm/yyyy</span>}
+                                      {field.value ? (
+                                        format(field.value, "PPP")
+                                      ) : (
+                                        <span>dd/mm/yyyy</span>
+                                      )}
                                       <Calendar className="ml-auto h-4 w-4 opacity-50" />
                                     </Button>
                                   </FormControl>
@@ -1503,7 +1757,10 @@ export function ApplicationForm() {
                                     mode="single"
                                     selected={field.value}
                                     onSelect={field.onChange}
-                                    disabled={(date) => date > new Date() || date < new Date("1900-01-01")}
+                                    disabled={(date) =>
+                                      date > new Date() ||
+                                      date < new Date("1900-01-01")
+                                    }
                                     initialFocus
                                     className="dark:bg-slate-800"
                                   />
@@ -1520,7 +1777,12 @@ export function ApplicationForm() {
               </Accordion>
 
               {/* OSCE Session */}
-              <Accordion type="single" collapsible defaultValue="osce" className="w-full">
+              <Accordion
+                type="single"
+                collapsible
+                defaultValue="osce"
+                className="w-full"
+              >
                 <AccordionItem
                   value="osce"
                   className="border dark:border-slate-700 rounded-lg overflow-hidden shadow-sm"
@@ -1535,13 +1797,15 @@ export function ApplicationForm() {
                     <div className="space-y-6">
                       <div className="p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-md border border-indigo-100 dark:border-indigo-800">
                         <p className="text-sm text-indigo-700 dark:text-indigo-300">
-                          The OSCE exam will take place over 12 days ({selectedExam ? selectedExam?.name : ""}{" "}
+                          The OSCE exam will take place over 12 days (
+                          {selectedExam ? selectedExam?.name : ""}{" "}
                           {Object.values(availableDates).map((dateStr: any) => {
-                            const day = new Date(dateStr).getDate()
-                            return <span key={dateStr}>{day}, </span>
+                            const day = new Date(dateStr).getDate();
+                            return <span key={dateStr}>{day}, </span>;
                           })}
-                          ) If you have a preference (e.g. for travel purposes) for a particular day, please indicate
-                          below your preferred choice:
+                          ) If you have a preference (e.g. for travel purposes)
+                          for a particular day, please indicate below your
+                          preferred choice:
                         </p>
                       </div>
 
@@ -1559,8 +1823,16 @@ export function ApplicationForm() {
                                   </SelectTrigger>
                                 </FormControl>
                                 <SelectContent className="dark:bg-slate-800 dark:border-slate-700">
-                                  {getAvailableDatesForField("preferenceDate1").map((date) => (
-                                    <SelectItem key={date.toISOString()} value={date.toISOString()}>
+                                  <SelectItem key="" value={null}>
+                                    None
+                                  </SelectItem>
+                                  {getAvailableDatesForField(
+                                    "preferenceDate1"
+                                  ).map((date) => (
+                                    <SelectItem
+                                      key={date.toISOString()}
+                                      value={date.toISOString()}
+                                    >
                                       {format(date, "MMMM d, yyyy")}
                                     </SelectItem>
                                   ))}
@@ -1584,8 +1856,16 @@ export function ApplicationForm() {
                                   </SelectTrigger>
                                 </FormControl>
                                 <SelectContent className="dark:bg-slate-800 dark:border-slate-700">
-                                  {getAvailableDatesForField("preferenceDate2").map((date) => (
-                                    <SelectItem key={date.toISOString()} value={date.toISOString()}>
+                                  <SelectItem key="" value={null}>
+                                    None
+                                  </SelectItem>
+                                  {getAvailableDatesForField(
+                                    "preferenceDate2"
+                                  ).map((date) => (
+                                    <SelectItem
+                                      key={date.toISOString()}
+                                      value={date.toISOString()}
+                                    >
                                       {format(date, "MMMM d, yyyy")}
                                     </SelectItem>
                                   ))}
@@ -1609,8 +1889,16 @@ export function ApplicationForm() {
                                   </SelectTrigger>
                                 </FormControl>
                                 <SelectContent className="dark:bg-slate-800 dark:border-slate-700">
-                                  {getAvailableDatesForField("preferenceDate3").map((date) => (
-                                    <SelectItem key={date.toISOString()} value={date.toISOString()}>
+                                  <SelectItem key="" value={undefined}>
+                                    None
+                                  </SelectItem>
+                                  {getAvailableDatesForField(
+                                    "preferenceDate3"
+                                  ).map((date) => (
+                                    <SelectItem
+                                      key={date.toISOString()}
+                                      value={date.toISOString()}
+                                    >
                                       {format(date, "MMMM d, yyyy")}
                                     </SelectItem>
                                   ))}
@@ -1623,30 +1911,38 @@ export function ApplicationForm() {
                       </div>
 
                       <div className="p-4 bg-amber-50 dark:bg-amber-900/20 rounded-md border border-amber-100 dark:border-amber-800">
-                        <h4 className="font-medium text-amber-800 dark:text-amber-300 mb-2">PLEASE NOTE</h4>
+                        <h4 className="font-medium text-amber-800 dark:text-amber-300 mb-2">
+                          PLEASE NOTE
+                        </h4>
                         <ul className="space-y-2 text-sm text-amber-700 dark:text-amber-300">
                           <li>
-                            The number of seats are limited and slots will be allocated on the "First Come First
-                            Served" basis.
+                            The number of seats are limited and slots will be
+                            allocated on the "First Come First Served" basis.
                           </li>
                           <li>
-                            Whilst we will try to accommodate your preference, it may not be possible due to a large
-                            number of applicants.
+                            Whilst we will try to accommodate your preference,
+                            it may not be possible due to a large number of
+                            applicants.
                           </li>
                           <li>
-                            Please email us well in advance if you require a letter of invitation for visa purposes
-                            and make sure you complete all travel formalities in good time (visa applications, travel
-                            permits, leaves, etc.) No Refunds will be granted in case any candidate fails to get the
-                            visa prior to the exam date.
+                            Please email us well in advance if you require a
+                            letter of invitation for visa purposes and make sure
+                            you complete all travel formalities in good time
+                            (visa applications, travel permits, leaves, etc.) No
+                            Refunds will be granted in case any candidate fails
+                            to get the visa prior to the exam date.
                           </li>
                           <li>
-                            Candidates with a disability are requested to read the rules and regulation document [Page
-                            10] available on the website.
+                            Candidates with a disability are requested to read
+                            the rules and regulation document [Page 10]
+                            available on the website.
                           </li>
                           <li>
-                            The MRCGP [INT.] South Asia Secretariat will notify you by email of your allocated date
-                            and time at least four weeks before the exam starting date. [It is advised to make your
-                            travel arrangements once you receive this email]
+                            The MRCGP [INT.] South Asia Secretariat will notify
+                            you by email of your allocated date and time at
+                            least four weeks before the exam starting date. [It
+                            is advised to make your travel arrangements once you
+                            receive this email]
                           </li>
                         </ul>
                       </div>
@@ -1656,7 +1952,12 @@ export function ApplicationForm() {
               </Accordion>
 
               {/* Candidate's Statement */}
-              <Accordion type="single" collapsible defaultValue="statement" className="w-full">
+              <Accordion
+                type="single"
+                collapsible
+                defaultValue="statement"
+                className="w-full"
+              >
                 <AccordionItem
                   value="statement"
                   className="border dark:border-slate-700 rounded-lg overflow-hidden shadow-sm"
@@ -1671,37 +1972,52 @@ export function ApplicationForm() {
                     <div className="space-y-6">
                       <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-md border border-slate-200 dark:border-slate-700">
                         <p className="text-sm text-slate-700 dark:text-slate-300 mb-4">
-                          I hereby apply to sit the South Asia MRCGP [INT.] Part 2 (OSCE) Examination, success in
-                          which will allow me to apply for International Membership of the UK's Royal College of
-                          General Practitioners. Detailed information on the membership application process can be
-                          found on the RCGP website:{" "}
-                          <a href="#" className="text-indigo-600 dark:text-indigo-400 hover:underline">
+                          I hereby apply to sit the South Asia MRCGP [INT.] Part
+                          2 (OSCE) Examination, success in which will allow me
+                          to apply for International Membership of the UK's
+                          Royal College of General Practitioners. Detailed
+                          information on the membership application process can
+                          be found on the RCGP website:{" "}
+                          <a
+                            href="#"
+                            className="text-indigo-600 dark:text-indigo-400 hover:underline"
+                          >
                             Member Ship
                           </a>
                         </p>
                         <p className="text-sm text-slate-700 dark:text-slate-300 mb-4">
-                          I have read and agree to abide by the conditions set out in the South Asia MRCGP [INT.]
-                          Examination Rules and Regulations as published on the MRCGP [INT.] South Asia website:{" "}
+                          I have read and agree to abide by the conditions set
+                          out in the South Asia MRCGP [INT.] Examination Rules
+                          and Regulations as published on the MRCGP [INT.] South
+                          Asia website:{" "}
                           <a
                             href="http://www.mrcgpintsouthasia.org"
                             className="text-indigo-600 dark:text-indigo-400 hover:underline"
                           >
                             www.mrcgpintsouthasia.org
                           </a>{" "}
-                          If accepted for International Membership, I undertake to continue approved postgraduate
-                          study while I remain in active general practice/family practice, and to uphold and promote
-                          the aims of the RCGP to the best of my ability.
+                          If accepted for International Membership, I undertake
+                          to continue approved postgraduate study while I remain
+                          in active general practice/family practice, and to
+                          uphold and promote the aims of the RCGP to the best of
+                          my ability.
                         </p>
                         <p className="text-sm text-slate-700 dark:text-slate-300 mb-4">
-                          I understand that, on being accepted for International Membership, an annual subscription
-                          fee is to be payable to the RCGP. I understand that only registered International Members
-                          who maintain their RCGP subscription are entitled to use the post-nominal designation "MRCGP
-                          [INT]". Success in the exam does not give me the right to refer to myself as MRCGP [INT.].
+                          I understand that, on being accepted for International
+                          Membership, an annual subscription fee is to be
+                          payable to the RCGP. I understand that only registered
+                          International Members who maintain their RCGP
+                          subscription are entitled to use the post-nominal
+                          designation "MRCGP [INT]". Success in the exam does
+                          not give me the right to refer to myself as MRCGP
+                          [INT.].
                         </p>
                         <p className="text-sm text-slate-700 dark:text-slate-300">
-                          I also understand and agree that my personal data will be handled by the MRCGP [INT.] South
-                          Asia Board and I also give permission for my personal data to be handled by the regional
-                          MRCGP [INT.] South Asia co-ordinators.
+                          I also understand and agree that my personal data will
+                          be handled by the MRCGP [INT.] South Asia Board and I
+                          also give permission for my personal data to be
+                          handled by the regional MRCGP [INT.] South Asia
+                          co-ordinators.
                         </p>
                       </div>
                       <FormField
@@ -1718,10 +2034,12 @@ export function ApplicationForm() {
                             </FormControl>
                             <div className="space-y-1 leading-none">
                               <FormLabel className="text-sm font-medium">
-                                I agree to the terms and conditions <span className="text-red-500">*</span>
+                                I agree to the terms and conditions{" "}
+                                <span className="text-red-500">*</span>
                               </FormLabel>
                               <FormDescription className="text-xs">
-                                By checking this box, I confirm that I have read and agree to the statements above.
+                                By checking this box, I confirm that I have read
+                                and agree to the statements above.
                               </FormDescription>
                             </div>
                             <FormMessage />
@@ -1732,11 +2050,14 @@ export function ApplicationForm() {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* File Uploads */}
                         <div className="space-y-4">
-                          <h3 className="text-base font-medium">Required Documents</h3>
+                          <h3 className="text-base font-medium">
+                            Required Documents
+                          </h3>
 
                           <div className="space-y-2">
                             <FormLabel>
-                              Valid Medical license: (Use .png or .jpg only)   <span className="text-red-500">*</span>
+                              Valid Medical license: (Use .png or .jpg only){" "}
+                              <span className="text-red-500">*</span>
                             </FormLabel>
                             <div className="flex items-center justify-center w-full">
                               {medicalLicensePreview ? (
@@ -1757,11 +2078,12 @@ export function ApplicationForm() {
                                       variant="outline"
                                       size="sm"
                                       onClick={() => {
-                                        setMedicalLicensePreview(null)
-                                        const fileInput = document.getElementById(
-                                          "medical-license",
-                                        ) as HTMLInputElement
-                                        if (fileInput) fileInput.value = ""
+                                        setMedicalLicensePreview(null);
+                                        const fileInput =
+                                          document.getElementById(
+                                            "medical-license"
+                                          ) as HTMLInputElement;
+                                        if (fileInput) fileInput.value = "";
                                       }}
                                       className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700"
                                     >
@@ -1772,14 +2094,21 @@ export function ApplicationForm() {
                               ) : (
                                 <label
                                   htmlFor="medical-license"
-                                  className={warning ? "border-red-700 flex flex-col items-center justify-center w-full h-24 border-2 border-dashed rounded-lg cursor-pointer bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 " :"flex flex-col items-center justify-center w-full h-24 border-2 border-dashed rounded-lg cursor-pointer bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 "}
-
+                                  className={
+                                    warning
+                                      ? "border-red-700 flex flex-col items-center justify-center w-full h-24 border-2 border-dashed rounded-lg cursor-pointer bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 "
+                                      : "flex flex-col items-center justify-center w-full h-24 border-2 border-dashed rounded-lg cursor-pointer bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 "
+                                  }
                                 >
-                                  <div className={`flex flex-col items-center justify-center pt-5 pb-6 `}>
-
-                                    <Upload className="w-6 h-6 mb-1 text-slate-500 dark:text-slate-400"/>
+                                  <div
+                                    className={`flex flex-col items-center justify-center pt-5 pb-6 `}
+                                  >
+                                    <Upload className="w-6 h-6 mb-1 text-slate-500 dark:text-slate-400" />
                                     <p className="text-xs text-slate-500 dark:text-slate-400">
-                                      <span className={`font-semibold`}>Click to upload</span> or drag and drop
+                                      <span className={`font-semibold`}>
+                                        Click to upload
+                                      </span>{" "}
+                                      or drag and drop
                                     </p>
                                   </div>
                                   <input
@@ -1789,7 +2118,10 @@ export function ApplicationForm() {
                                     accept="image/png, image/jpeg, image/jpg"
                                     onChange={(e) => {
                                       if (e.target.files && e.target.files[0]) {
-                                        validateFile(e.target.files[0], "medical-license")
+                                        validateFile(
+                                          e.target.files[0],
+                                          "medical-license"
+                                        );
                                       }
                                     }}
                                   />
@@ -1800,7 +2132,7 @@ export function ApplicationForm() {
 
                           <div className="space-y-2">
                             <FormLabel>
-                              Part I passing email: (Use .png or .jpg only) 
+                              Part I passing email: (Use .png or .jpg only)
                             </FormLabel>
                             <div className="flex items-center justify-center w-full">
                               {part1EmailPreview ? (
@@ -1821,9 +2153,12 @@ export function ApplicationForm() {
                                       variant="outline"
                                       size="sm"
                                       onClick={() => {
-                                        setPart1EmailPreview(null)
-                                        const fileInput = document.getElementById("part1-email") as HTMLInputElement
-                                        if (fileInput) fileInput.value = ""
+                                        setPart1EmailPreview(null);
+                                        const fileInput =
+                                          document.getElementById(
+                                            "part1-email"
+                                          ) as HTMLInputElement;
+                                        if (fileInput) fileInput.value = "";
                                       }}
                                       className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700"
                                     >
@@ -1834,13 +2169,17 @@ export function ApplicationForm() {
                               ) : (
                                 <label
                                   htmlFor="part1-email"
-                                  className={"flex flex-col items-center justify-center w-full h-24 border-2 border-dashed rounded-lg cursor-pointer bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 "}
-
+                                  className={
+                                    "flex flex-col items-center justify-center w-full h-24 border-2 border-dashed rounded-lg cursor-pointer bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 "
+                                  }
                                 >
                                   <div className="flex flex-col items-center justify-center pt-5 pb-6">
                                     <Upload className="w-6 h-6 mb-1 text-slate-500 dark:text-slate-400" />
                                     <p className="text-xs text-slate-500 dark:text-slate-400">
-                                      <span className="font-semibold">Click to upload</span> or drag and drop
+                                      <span className="font-semibold">
+                                        Click to upload
+                                      </span>{" "}
+                                      or drag and drop
                                     </p>
                                   </div>
                                   <input
@@ -1850,7 +2189,10 @@ export function ApplicationForm() {
                                     accept="image/png, image/jpeg, image/jpg"
                                     onChange={(e) => {
                                       if (e.target.files && e.target.files[0]) {
-                                        validateFile(e.target.files[0], "part1-email")
+                                        validateFile(
+                                          e.target.files[0],
+                                          "part1-email"
+                                        );
                                       }
                                     }}
                                   />
@@ -1865,8 +2207,8 @@ export function ApplicationForm() {
 
                           <div className="space-y-2">
                             <FormLabel>
-                              Passport bio Page (Valid): (Use .png or .jpg only){" "} <span className="text-red-500">*</span>
-                            
+                              Passport bio Page (Valid): (Use .png or .jpg only){" "}
+                              <span className="text-red-500">*</span>
                             </FormLabel>
                             <div className="flex items-center justify-center w-full">
                               {passportBioPreview ? (
@@ -1887,9 +2229,12 @@ export function ApplicationForm() {
                                       variant="outline"
                                       size="sm"
                                       onClick={() => {
-                                        setPassportBioPreview(null)
-                                        const fileInput = document.getElementById("passport-bio") as HTMLInputElement
-                                        if (fileInput) fileInput.value = ""
+                                        setPassportBioPreview(null);
+                                        const fileInput =
+                                          document.getElementById(
+                                            "passport-bio"
+                                          ) as HTMLInputElement;
+                                        if (fileInput) fileInput.value = "";
                                       }}
                                       className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700"
                                     >
@@ -1900,13 +2245,19 @@ export function ApplicationForm() {
                               ) : (
                                 <label
                                   htmlFor="passport-bio"
-                                  className={warning ? "border-red-700 flex flex-col items-center justify-center w-full h-24 border-2 border-dashed rounded-lg cursor-pointer bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 " :"flex flex-col items-center justify-center w-full h-24 border-2 border-dashed rounded-lg cursor-pointer bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 "}
-
+                                  className={
+                                    warning
+                                      ? "border-red-700 flex flex-col items-center justify-center w-full h-24 border-2 border-dashed rounded-lg cursor-pointer bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 "
+                                      : "flex flex-col items-center justify-center w-full h-24 border-2 border-dashed rounded-lg cursor-pointer bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 "
+                                  }
                                 >
                                   <div className="flex flex-col items-center justify-center pt-5 pb-6">
                                     <Upload className="w-6 h-6 mb-1 text-slate-500 dark:text-slate-400" />
                                     <p className="text-xs text-slate-500 dark:text-slate-400">
-                                      <span className="font-semibold">Click to upload</span> or drag and drop
+                                      <span className="font-semibold">
+                                        Click to upload
+                                      </span>{" "}
+                                      or drag and drop
                                     </p>
                                   </div>
                                   <input
@@ -1916,7 +2267,10 @@ export function ApplicationForm() {
                                     accept="image/png, image/jpeg, image/jpg"
                                     onChange={(e) => {
                                       if (e.target.files && e.target.files[0]) {
-                                        validateFile(e.target.files[0], "passport-bio")
+                                        validateFile(
+                                          e.target.files[0],
+                                          "passport-bio"
+                                        );
                                       }
                                     }}
                                   />
@@ -1927,14 +2281,17 @@ export function ApplicationForm() {
 
                           <div className="space-y-2">
                             <FormLabel>
-                              Signature: (Use .png or .jpg only) <span className="text-red-500">*</span>
+                              Signature: (Use .png or .jpg only){" "}
+                              <span className="text-red-500">*</span>
                             </FormLabel>
                             <div className="flex items-center justify-center w-full">
                               {signaturePreview ? (
                                 <div className="relative w-full">
                                   <div className="flex flex-col items-center">
                                     <img
-                                      src={signaturePreview || "/placeholder.svg"}
+                                      src={
+                                        signaturePreview || "/placeholder.svg"
+                                      }
                                       alt="Signature preview"
                                       className="h-40 object-contain rounded-md mb-2 border border-slate-200 dark:border-slate-700"
                                     />
@@ -1943,9 +2300,12 @@ export function ApplicationForm() {
                                       variant="outline"
                                       size="sm"
                                       onClick={() => {
-                                        setSignaturePreview(null)
-                                        const fileInput = document.getElementById("signature") as HTMLInputElement
-                                        if (fileInput) fileInput.value = ""
+                                        setSignaturePreview(null);
+                                        const fileInput =
+                                          document.getElementById(
+                                            "signature"
+                                          ) as HTMLInputElement;
+                                        if (fileInput) fileInput.value = "";
                                       }}
                                       className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700"
                                     >
@@ -1956,13 +2316,19 @@ export function ApplicationForm() {
                               ) : (
                                 <label
                                   htmlFor="signature"
-                                  className={warning ? "border-red-700 flex flex-col items-center justify-center w-full h-24 border-2 border-dashed rounded-lg cursor-pointer bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 " :"flex flex-col items-center justify-center w-full h-24 border-2 border-dashed rounded-lg cursor-pointer bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 "}
-
+                                  className={
+                                    warning
+                                      ? "border-red-700 flex flex-col items-center justify-center w-full h-24 border-2 border-dashed rounded-lg cursor-pointer bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 "
+                                      : "flex flex-col items-center justify-center w-full h-24 border-2 border-dashed rounded-lg cursor-pointer bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 "
+                                  }
                                 >
                                   <div className="flex flex-col items-center justify-center pt-5 pb-6">
                                     <Upload className="w-6 h-6 mb-1 text-slate-500 dark:text-slate-400" />
                                     <p className="text-xs text-slate-500 dark:text-slate-400">
-                                      <span className="font-semibold">Click to upload</span> or drag and drop
+                                      <span className="font-semibold">
+                                        Click to upload
+                                      </span>{" "}
+                                      or drag and drop
                                     </p>
                                   </div>
                                   <input
@@ -1972,7 +2338,10 @@ export function ApplicationForm() {
                                     accept="image/png, image/jpeg, image/jpg"
                                     onChange={(e) => {
                                       if (e.target.files && e.target.files[0]) {
-                                        validateFile(e.target.files[0], "signature")
+                                        validateFile(
+                                          e.target.files[0],
+                                          "signature"
+                                        );
                                       }
                                     }}
                                   />
@@ -1989,7 +2358,8 @@ export function ApplicationForm() {
                             render={({ field }) => (
                               <FormItem>
                                 <FormLabel>
-                                  Full name: <span className="text-red-500">*</span>
+                                  Full name:{" "}
+                                  <span className="text-red-500">*</span>
                                 </FormLabel>
                                 <FormControl>
                                   <Input
@@ -2018,10 +2388,13 @@ export function ApplicationForm() {
                                         variant={"outline"}
                                         className={cn(
                                           "w-full pl-3 text-left font-normal bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus-visible:ring-indigo-500",
-                                          !field.value && "text-muted-foreground",
+                                          !field.value &&
+                                            "text-muted-foreground"
                                         )}
                                       >
-                                        {field.value ? format(field.value, "PPP") : <span>dd/mm/yyyy</span>}
+                                        {field.value
+                                          ? format(field.value, "PPP")
+                                          : format(new Date(), "PPP")}
                                         <Calendar className="ml-auto h-4 w-4 opacity-50" />
                                       </Button>
                                     </FormControl>
@@ -2034,7 +2407,10 @@ export function ApplicationForm() {
                                       mode="single"
                                       selected={field.value}
                                       onSelect={field.onChange}
-                                      disabled={(date) => date > new Date() || date < new Date("1900-01-01")}
+                                      disabled={(date) =>
+                                        date > new Date() ||
+                                        date < new Date("1900-01-01")
+                                      }
                                       initialFocus
                                       className="dark:bg-slate-800"
                                     />
@@ -2051,118 +2427,104 @@ export function ApplicationForm() {
                 </AccordionItem>
               </Accordion>
               <div className="flex flex-col sm:flex-row gap-4 justify-end">
-              <PDFDownloadLink
-                id="pdf-download-link"
-                document={<ApplicationPDFComplete data={form.getValues()} images={pdfImages} />}
-                fileName="MRCGP_Application_Form.pdf"
-                className="hidden"
-              >
-                {({ loading }) => (
-                  <>
-                    {loading || pdfGenerating ? (
-                      <>
-                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        Generating PDF...
-                      </>
-                    ) : (
-                      <>
-                        <Eye className="h-4 w-4 mr-2" />
-                        Preview
-                      </>
-                    )}
-                  </>
-                )}
-              </PDFDownloadLink>
-              <Button
-                type="button"
-                variant="outline"
-                
-                onClick={() => {
-                  // Check if all required fields are filled
-                  const isValid = form.formState.isValid;
-                  console.log(form.formState,"isValid");
-                  console.log(isValid,"isValid");
-                  
-                  if (!isValid) {
-                    Swal.fire({
-                      title: "Missing Information",
-                      text: "Please fill in all required fields before generating a preview",
-                      icon: "warning",
-                      confirmButtonColor: "#6366f1",
-                    });
-                    return;
+                <PDFDownloadLink
+                  id="pdf-download-link"
+                  document={
+                    <ApplicationPDFComplete
+                      data={form.getValues()}
+                      images={pdfImages}
+                    />
                   }
+                  fileName="MRCGP_Application_Form.pdf"
+                  className="hidden"
+                >
+                  {({ loading }) => (
+                    <>
+                      {loading || pdfGenerating ? (
+                        <>
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          Generating PDF...
+                        </>
+                      ) : (
+                        <>
+                          <Eye className="h-4 w-4 mr-2" />
+                          Preview
+                        </>
+                      )}
+                    </>
+                  )}
+                </PDFDownloadLink>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    // Check if all required fields are filled
+                    const isValid = form.formState.isValid;
 
-                  // Set preview mode to true to generate PDF with current form data
-                  setPreviewMode(true);
-
-                  // Create a new window to open the PDF
-                  setTimeout(() => {
-                    const pdfBlob = document.getElementById("pdf-download-link");
-                    if (pdfBlob) {
-                      // @ts-ignore
-                      const pdfUrl = pdfBlob.href;
-                      window.open(pdfUrl, "_blank");
-                      form.reset()
-                      setPassportPreview(null)
-                      setMedicalLicensePreview(null)
-                      setPart1EmailPreview(null)
-                      setPassportBioPreview(null)
-                      setSignaturePreview(null)
-                  
+                    if (!isValid) {
+                      Swal.fire({
+                        title: "Missing Information",
+                        text: "Please fill in all required fields before generating a preview",
+                        icon: "warning",
+                        confirmButtonColor: "#6366f1",
+                      });
+                      return;
                     }
-                  }, 500); // Increased timeout to ensure PDF generation completes
-                }}
-                className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
-              >
-                <Eye className="h-4 w-4 mr-2" />
-                Preview
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                id="preview-button"
-                onClick={() => {
-                  // Check if all required fields are filled
-                 
 
-                  // Set preview mode to true to generate PDF with current form data
-                  setPreviewMode(true);
-
-                  // Create a new window to open the PDF
-                  setTimeout(() => {
-                    const pdfBlob = document.getElementById("pdf-download-link");
-                    if (pdfBlob) {
-                      // @ts-ignore
-                      const pdfUrl = pdfBlob.href;
-                      window.open(pdfUrl, "_blank");
-                      form.reset()
-                      setPassportPreview(null)
-                      setMedicalLicensePreview(null)
-                      setPart1EmailPreview(null)
-                      setPassportBioPreview(null)
-                      setSignaturePreview(null)
-                  
-                    }
-                  }, 500); // Increased timeout to ensure PDF generation completes
-                }}
-                className=" hidden items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
-              >
-              </Button>
-              <Button
-                type="submit"
-                disabled={isSubmitting}
-                className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white transition-all duration-200 transform hover:scale-105"
-              >
-                {isSubmitting ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Submitting...
-                  </>
-                ) : (
-                  "Submit"
-                )}
-              </Button>
+                    // Create a new window to open the PDF
+                    setTimeout(() => {
+                      const pdfBlob =
+                        document.getElementById("pdf-download-link");
+                      if (pdfBlob) {
+                        // @ts-ignore
+                        const pdfUrl = pdfBlob.href;
+                        window.open(pdfUrl, "_blank");
+                      }
+                    }, 500); // Increased timeout to ensure PDF generation completes
+                  }}
+                  className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
+                >
+                  <Eye className="h-4 w-4 mr-2" />
+                  Preview
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  id="preview-button"
+                  onClick={() => {
+                    // Create a new window to open the PDF
+                    setTimeout(() => {
+                      const pdfBlob =
+                        document.getElementById("pdf-download-link");
+                      if (pdfBlob) {
+                        // @ts-ignore
+                        const pdfUrl = pdfBlob.href;
+                        window.open(pdfUrl, "_blank");
+                        form.reset();
+                        setPassportPreview(null);
+                        setMedicalLicensePreview(null);
+                        setPart1EmailPreview(null);
+                        setPassportBioPreview(null);
+                        setSignaturePreview(null);
+                      }
+                    }, 500); // Increased timeout to ensure PDF generation completes
+                  }}
+                  className=" hidden items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
+                ></Button>
+                <Button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white transition-all duration-200 transform hover:scale-105"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Submitting...
+                    </>
+                  ) : (
+                    "Submit"
+                  )}
+                </Button>
               </div>
             </form>
           </Form>
@@ -2174,8 +2536,7 @@ export function ApplicationForm() {
           </div>
         </div>
       </Card>
-    </div >
-
-  )
+    </div>
+  );
 }
-export default ApplicationForm
+export default ApplicationForm;

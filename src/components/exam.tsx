@@ -131,8 +131,6 @@ export function Exam() {
     field: string,
     value: { from: string; to: string }
   ) => {
-    console.log("Date Range Changed:", field, value);
-    
     setFormData({
       ...formData,
       [field]: value,
@@ -141,12 +139,6 @@ export function Exam() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
-    // 📦 Yahan pe hum formData ko ek variable mein save karenge
-    const submittedFormData = { ...formData };
-
-    console.log("Submitted Form Data:", submittedFormData);
-    // Yahan tum ab submittedFormData ko kahin bhi bhej sakte ho ya store kar sakte ho
 
     if (editMode && editId !== null) {
       // Update existing exam
