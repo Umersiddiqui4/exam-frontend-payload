@@ -1889,7 +1889,7 @@ export function ApplicationForm() {
                                   </SelectTrigger>
                                 </FormControl>
                                 <SelectContent className="dark:bg-slate-800 dark:border-slate-700">
-                                  <SelectItem key="" value={undefined}>
+                                  <SelectItem key="" value={""}>
                                     None
                                   </SelectItem>
                                   {getAvailableDatesForField(
