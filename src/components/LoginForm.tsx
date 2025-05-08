@@ -50,8 +50,10 @@ export function LoginForm() {
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <Card className="w-full max-w-md mx-auto">
         <CardHeader>
-          <CardTitle>Login</CardTitle>
-          <CardDescription>Enter your username and password to access your account.</CardDescription>
+
+          <div className='w-full flex justify-center items-center'>
+            <img src="/logo.png" className='items-center' alt="error" />
+          </div>
         </CardHeader>
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
