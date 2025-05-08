@@ -1135,8 +1135,8 @@ export function ApplicationForm() {
     }
   }; 
 
-  function test(test: any) {
-    console.log("test");
+  function test() {
+    
     
   }
 
