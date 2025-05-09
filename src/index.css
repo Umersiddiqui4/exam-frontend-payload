@@ -93,6 +93,41 @@ body {
   }
 }
 
-warning {
+.warning {
   color: red !important;
+}
+
+/* Add this to your global CSS file */
+
+.custom-swal-container {
+  z-index: 9999;
+}
+
+.custom-swal-popup {
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.custom-swal-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #4b5563;
+  margin-bottom: 15px;
+}
+
+.custom-swal-confirm {
+  padding: 10px 24px;
+  font-weight: 500;
+  border-radius: 6px;
+  text-transform: none;
+  font-size: 16px;
+}
+
+.custom-swal-cancel {
+  padding: 10px 24px;
+  font-weight: 500;
+  border-radius: 6px;
+  text-transform: none;
+  font-size: 16px;
 }

@@ -9,6 +9,7 @@ import {ApplicationForm} from './components/application-form';
 import ExamComponent from './components/examComponent';
 import { LoginForm } from './components/LoginForm';
 import { ProtectedRoute } from './auth/ProtectedRoute';
+import Applications from './components/Applications';
 
 function App() {
   return (
@@ -29,6 +30,14 @@ function App() {
             path="/application/:examId"
             element={
                 <ApplicationForm />
+            }
+          />
+          <Route
+            path="/applications"
+            element={
+              <ProtectedRoute>
+                <Applications />
+              </ProtectedRoute>
             }
           />
           <Route

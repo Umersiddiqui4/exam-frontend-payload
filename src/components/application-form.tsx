@@ -157,11 +157,17 @@ type FormValues = z.infer<typeof formSchema>;
 
 // Part 1 exam dates
 const part1ExamDates = [
-  "AKT – November 2024",
-  "AKT – August 2024",
-  "AKT – May 2024",
-  "AKT – February 2024",
-  "AKT – November 2023",
+  "AKT - November 2024",
+  "AKT - May 2024",
+  "AKT - November 2023",
+  "AKT - May 2023",
+  "AKT - November 2022",
+  "AKT - June 2022",
+  "AKT - January 2022",
+  "AKT - June 2021",
+  "AKT - September 2020",
+  "AKT - November 2019",
+  "AKT - May 2019",
 ];
 
 const parseSlotDates = (slotString: string): Date[] => {
@@ -245,9 +251,345 @@ export function ApplicationForm() {
       registrationNumber: "",
       termsAgreed: false,
     },
+    
   });
   // PDF Document Component with multi-page support
 
+  const Watermark = () => (
+    <View style={styles.watermarkContainer} fixed>
+      <Text style={styles.watermarkText}>Preview</Text>
+    </View>
+  )
+  
+  const ApplicationPDFCompletePreview = ({ data, images }: any) => {
+    return (
+      <Document>
+        {/* Main application form page */}
+        <Page size="A4" style={styles.page}>
+          {/* Watermark */}
+  
+          <View style={styles.watermarkContainer} fixed>
+      <Text style={styles.watermarkText}>Preview</Text>
+    </View>
+  
+          {/* Header */}
+          <View style={styles.header}>
+            <View style={styles.headerContent1}>
+              <Image src="/icon.png" style={styles.passportImage1} />
+              <div className="text-center">
+                <Text style={styles.title}>MRCGP [INT.] South Asia</Text>
+                <Text style={styles.subtitle}>Part 2 (OSCE) Examination Application</Text>
+              </div>
+            </View>
+            {images.passport && <Image src={images.passport || "/placeholder.svg"} style={styles.passportImage} />}
+          </View>
+  
+          {/* Main content - Resume style format */}
+          <View style={styles.section}>
+            {/* Candidate information section */}
+            <View style={styles.resumeSection}>
+              <View style={styles.resumeHeader}>
+                <Text style={styles.resumeSectionTitle}>CANDIDATE INFORMATION</Text>
+              </View>
+              <View style={styles.resumeBody}>
+                <View style={styles.row}>
+                  <View style={styles.column}>
+                    <View style={styles.fieldRow}>
+                      <Text style={styles.fieldLabel}>Candidate ID:</Text>
+                      <Text style={styles.fieldValue}>{data.candidateId || "Not provided"}</Text>
+                    </View>
+                    <View style={styles.fieldRow}>
+                      <Text style={styles.fieldLabel}>Full Name:</Text>
+                      <Text style={styles.fieldValue}>{data.fullName || "Not provided"}</Text>
+                    </View>
+                  </View>
+                </View>
+              </View>
+            </View>
+  
+            {/* Contact information section */}
+            <View style={styles.resumeSection}>
+              <View style={styles.resumeHeader}>
+                <Text style={styles.resumeSectionTitle}>CONTACT INFORMATION</Text>
+              </View>
+              <View style={styles.resumeBody}>
+                <View style={styles.row}>
+                  <View style={styles.column}>
+                    <View style={styles.fieldRow}>
+                      <Text style={styles.fieldLabel}>WhatsApp:</Text>
+                      <Text style={styles.fieldValue}>{data.whatsapp || "Not provided"}</Text>
+                    </View>
+                    <View style={styles.fieldRow}>
+                      <Text style={styles.fieldLabel}>Emergency Contact:</Text>
+                      <Text style={styles.fieldValue}>{data.emergencyContact || "Not provided"}</Text>
+                    </View>
+                    <View style={styles.fieldRow}>
+                      <Text style={styles.fieldLabel}>Email:</Text>
+                      <Text style={styles.fieldValue}>{data.email || "Not provided"}</Text>
+                    </View>
+                  </View>
+                </View>
+              </View>
+            </View>
+  
+            {/* Address section */}
+            <View style={styles.resumeSection}>
+              <View style={styles.resumeHeader}>
+                <Text style={styles.resumeSectionTitle}>CONTACT INFORMATION</Text>
+              </View>
+              <View style={styles.resumeBody}>
+                <View style={styles.row}>
+                  <View style={styles.column}>
+                    <View style={styles.fieldRow}>
+                      <Text style={styles.fieldLabel}>Post Box:</Text>
+                      <Text style={styles.fieldValue}>{data.poBox || "No address"}</Text>
+                    </View>
+                    <View style={styles.fieldRow}>
+                      <Text style={styles.fieldLabel}>District</Text>
+                      <Text style={styles.fieldValue}>{data.district || ""}</Text>
+                    </View>
+                    <View style={styles.fieldRow}>
+                      <Text style={styles.fieldLabel}>City:</Text>
+                      <Text style={styles.fieldValue}>{data.city || ""}</Text>
+                    </View>
+                    <View style={styles.fieldRow}>
+                      <Text style={styles.fieldLabel}>province:</Text>
+                      <Text style={styles.fieldValue}>{data.province || ""}</Text>
+                    </View>
+                    <View style={styles.fieldRow}>
+                      <Text style={styles.fieldLabel}>Country:</Text>
+                      <Text style={styles.fieldValue}>{data.country || ""}</Text>
+                    </View>
+                  </View>
+                </View>
+              </View>
+            </View>
+  
+            {/* Experience section */}
+            <View style={styles.resumeSection}>
+              <View style={styles.resumeHeader}>
+                <Text style={styles.resumeSectionTitle}>EXPERIENCE</Text>
+              </View>
+              <View style={styles.resumeBody}>
+                <View style={styles.fieldRow}>
+                  <Text style={styles.fieldLabel}>Date of passing Part 1:</Text>
+                  <Text style={styles.fieldValue}>{data.dateOfPassingPart1 || "Not provided"}</Text>
+                </View>
+                <View style={styles.fieldRow}>
+                  <Text style={styles.fieldLabel}>Previous OSCE attempts:</Text>
+                  <Text style={styles.fieldValue}>{data.previousOsceAttempts || "Not provided"}</Text>
+                </View>
+                <View style={styles.fieldRow}>
+                  <Text style={styles.fieldLabel}>Country of experience:</Text>
+                  <Text style={styles.fieldValue}>{data.countryOfExperience || "Not provided"}</Text>
+                </View>
+                <View style={styles.fieldRow}>
+                  <Text style={styles.fieldLabel}>Country of origin:</Text>
+                  <Text style={styles.fieldValue}>{data.countryOfOrigin || "Not provided"}</Text>
+                </View>
+              </View>
+            </View>
+  
+            {/* License details section */}
+            <View style={styles.resumeSection}>
+              <View style={styles.resumeHeader}>
+                <Text style={styles.resumeSectionTitle}>LICENSE DETAILS</Text>
+              </View>
+              <View style={styles.resumeBody}>
+                <View style={styles.fieldRow}>
+                  <Text style={styles.fieldLabel}>Registration authority:</Text>
+                  <Text style={styles.fieldValue}>{data.registrationAuthority || "Not provided"}</Text>
+                </View>
+                <View style={styles.fieldRow}>
+                  <Text style={styles.fieldLabel}>Registration number:</Text>
+                  <Text style={styles.fieldValue}>{data.registrationNumber || "Not provided"}</Text>
+                </View>
+                <View style={styles.fieldRow}>
+                  <Text style={styles.fieldLabel}>Date of registration:</Text>
+                  <Text style={styles.fieldValue}>
+                    {data.dateOfRegistration ? format(data.dateOfRegistration, "PPP") : "Not provided"}
+                  </Text>
+                </View>
+              </View>
+            </View>
+  
+            {/* OSCE Session Preferences */}
+            <View style={styles.resumeSection}>
+              <View style={styles.resumeHeader}>
+                <Text style={styles.resumeSectionTitle}>OSCE SESSION PREFERENCES</Text>
+              </View>
+              <View style={styles.resumeBody}>
+                <View style={styles.fieldRow}>
+                  <Text style={styles.fieldLabel}>Preference Date 1:</Text>
+                  <Text style={styles.fieldValue}>
+                    {data.preferenceDate1 && data.preferenceDate1 !== " "
+                      ? format(new Date(data.preferenceDate1), "PPP")
+                      : "Not provided"}
+                  </Text>
+                </View>
+                <View style={styles.fieldRow}>
+                  <Text style={styles.fieldLabel}>Preference Date 2:</Text>
+                  <Text style={styles.fieldValue}>
+                    {data.preferenceDate2 && data.preferenceDate2 !== " "
+                      ? format(new Date(data.preferenceDate2), "PPP")
+                      : "Not provided"}
+                  </Text>
+                </View>
+                <View style={styles.fieldRow}>
+                  <Text style={styles.fieldLabel}>Preference Date 3:</Text>
+                  <Text style={styles.fieldValue}>
+                    {data.preferenceDate3 && data.preferenceDate3 !== " "
+                      ? format(new Date(data.preferenceDate3), "PPP")
+                      : "Not provided"}
+                  </Text>
+                </View>
+              </View>
+            </View>
+  
+            {/* Agreement */}
+            <View style={styles.resumeSection}>
+              <View style={styles.resumeHeader}>
+                <Text style={styles.resumeSectionTitle}>AGREEMENT</Text>
+              </View>
+              <View style={styles.resumeBody}>
+                <View style={styles.fieldRow}>
+                  <Text style={styles.fieldLabel}>Name:</Text>
+                  <Text style={styles.fieldValue}>{data.agreementName || "Not provided"}</Text>
+                </View>
+                <View style={styles.fieldRow}>
+                  <Text style={styles.fieldLabel}>Date:</Text>
+                  <Text style={styles.fieldValue}>
+                    {data.agreementDate ? format(data.agreementDate, "PPP") : "Not provided"}
+                  </Text>
+                </View>
+                <View style={styles.fieldRow}>
+                  <Text style={styles.fieldLabel}>Terms Agreed:</Text>
+                  <Text style={styles.fieldValue}>{data.termsAgreed ? "Yes" : "No"}</Text>
+                </View>
+              </View>
+            </View>
+            <View style={styles.resumeSection}>
+              <View style={styles.resumeHeader}>
+                <Text style={styles.resumeSectionTitle}>Please Note</Text>
+              </View>
+              <View style={styles.resumeBody}>
+                <View style={styles.fieldRow}>
+                  <Text style={styles.note}>
+                    THE NUMBER OF PLACES IS LIMITED, AND SLOTS WILL BE ALLOCATED ON THE "FIRST COME FIRST SERVED" BASIS.
+                    Your application may be rejected because of a large number of applicants and you may be invited to
+                    apply again or offered a slot at a subsequent examination. Priority will be given to applicants from
+                    South Asia and those applications that reach us first, so we encourage you to apply as soon as
+                    possible. WHILST WE WILL TRY TO ACCOMMODATE YOUR PREFERENCE, IT MAY NOT BE POSSIBLE DUE TO A LARGE
+                    NUMBER OF APPLICANTS. Please email us well in advance if you require a letter of invitation for visa
+                    purposes and make sure you complete all travel formalities in good time (visa applications, travel
+                    permits, leaves, etc.) No Refunds will be granted in case any candidate fails to get the visa prior to
+                    the exam date. Candidates with a disability are requested to read the rules and regulation document
+                    [Page 10] available on the website The MRCGP [INT.] South Asia Secretariat will notify you by email of
+                    your allocated date and time at least two weeks before the exam starting date.
+                  </Text>
+                </View>
+              </View>
+            </View>
+            <View style={styles.resumeSection}>
+              <View style={styles.resumeHeader}>
+                <Text style={styles.resumeSectionTitle}>CANDIDATE'S STATEMENT</Text>
+              </View>
+              <View style={styles.resumeBody}>
+                <View style={styles.fieldRow}>
+                  <Text style={styles.note}>
+                    I hereby apply to sit the South Asia MRCGP [INT.] Part 2 (OSCE) Examination, success in which will
+                    allow me to apply for International Membership of the UK's Royal College of General Practitioners.
+                    Detailed information on the membership application process can be found on the RCGP website: Member
+                    Ship I have read and agree to abide by the conditions set out in the South Asia MRCGP [INT.]
+                    Examination Rules and Regulations as published on the MRCGP [INT.] South Asia website:
+                    www.mrcgpintsouthasia.org If accepted for International Membership, I undertake to continue approved
+                    postgraduate study while I remain in active general practice/family practice, and to uphold and
+                    promote the aims of the RCGP to the best of my ability. I understand that, on being accepted for
+                    International Membership, an annual subscription fee is to be payable to the RCGP. I understand that
+                    only registered International Members who maintain their RCGP subscription are entitled to use the
+                    post-nominal designation "MRCGP [INT]". Success in the exam does not give me the right to refer to
+                    myself as MRCGP [INT.]. I attach a banker's draft made payable to "MRCGP [INT.] South Asia", I also
+                    understand and agree that my personal data will be handled by the MRCGP [INT.] South Asia Board and I
+                    also give permission for my personal data to be handled by the regional MRCGP [INT.] South Asia
+                    co-ordinators..
+                  </Text>
+                </View>
+              </View>
+            </View>
+          </View>
+        </Page>
+  
+        {/* Each document on its own page */}
+        {images.medicalLicense && (
+          <Page size="A4" style={styles.page}>
+            {/* Watermark */}
+            <Watermark />
+  
+            <View style={styles.documentPage}>
+              <Text style={styles.documentPageTitle}>Medical License</Text>
+              <Image src={images.medicalLicense || "/placeholder.svg"} style={styles.documentPageImagePrev} />
+              <View style={styles.documentPageFooter}>
+                <Text style={styles.documentPageFooterText}>
+                  {data.fullName} - Candidate ID: {data.candidateId}
+                </Text>
+              </View>
+            </View>
+          </Page>
+        )}
+  
+        {images.part1Email && (
+          <Page size="A4" style={styles.page}>
+            {/* Watermark */}
+            <Watermark />
+  
+            <View style={styles.documentPage}>
+              <Text style={styles.documentPageTitle}>Part 1 Passing Email</Text>
+              <Image src={images.part1Email || "/placeholder.svg"} style={styles.documentPageImagePrev} />
+              <View style={styles.documentPageFooter}>
+                <Text style={styles.documentPageFooterText}>
+                  {data.fullName} - Candidate ID: {data.candidateId}
+                </Text>
+              </View>
+            </View>
+          </Page>
+        )}
+  
+        {images.passportBio && (
+          <Page size="A4" style={styles.page}>
+            {/* Watermark */}
+            <Watermark />
+  
+            <View style={styles.documentPage}>
+              <Text style={styles.documentPageTitle}>Passport Bio Page</Text>
+              <Image src={images.passportBio || "/placeholder.svg"} style={styles.documentPageImagePrev} />
+              <View style={styles.documentPageFooter}>
+                <Text style={styles.documentPageFooterText}>
+                  {data.fullName} - Candidate ID: {data.candidateId}
+                </Text>
+              </View>
+            </View>
+          </Page>
+        )}
+  
+        {images.signature && (
+          <Page size="A4" style={styles.page}>
+            {/* Watermark */}
+            <Watermark />
+  
+            <View style={styles.documentPage}>
+              <Text style={styles.documentPageTitle}>Signature</Text>
+              <Image src={images.signature || "/placeholder.svg"} style={styles.documentPageImagePrev} />
+              <View style={styles.documentPageFooter}>
+                <Text style={styles.documentPageFooterText}>
+                  {data.fullName} - Candidate ID: {data.candidateId}
+                </Text>
+              </View>
+            </View>
+          </Page>
+        )}
+      </Document>
+    )
+  }
   const ApplicationPDFComplete = ({ data, images }: any) => {
     return (
       <Document>
@@ -655,6 +997,28 @@ export function ApplicationForm() {
 
   // PDF Styles
   const styles = StyleSheet.create({
+    watermarkContainer: {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      zIndex: 9999,
+      
+      pointerEvents: "none",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      opacity: 0.9,
+    },
+    watermarkText: {
+      position: "absolute",
+      zIndex: 9999,
+      color: "#000000cc",
+      fontSize: 150,
+      // fontWeight: "bold",
+      transform: "rotate(-55deg)",
+    },
     page: {
       padding: 30,
       backgroundColor: "#ffffff",
@@ -711,6 +1075,20 @@ export function ApplicationForm() {
       height: 80,
       objectFit: "cover",
     },
+    passportImagePrev: {
+      width: 80,
+      height: 80,
+      objectFit: "cover",
+      borderRadius: 4,
+      border: "1px solid #e5e7eb",
+      opacity: 0.8,
+    },
+    passportImage1Prev: {
+      width: 80,
+      height: 80,
+      objectFit: "cover",
+      opacity: 0.8,
+    },
     section: {
       marginBottom: 10,
     },
@@ -740,7 +1118,7 @@ export function ApplicationForm() {
     },
     resumeBody: {
       padding: 8,
-      backgroundColor: "#f9fafb",
+      backgroundColor: "#ffffffdb",
     },
     fieldRow: {
       flexDirection: "row",
@@ -792,6 +1170,16 @@ export function ApplicationForm() {
       objectFit: "contain",
       marginBottom: 20,
       border: "1px solid #e5e7eb",
+      zIndex: 1,
+    },
+    documentPageImagePrev: {
+      width: "90%",
+      height: "70%",
+      objectFit: "contain",
+      marginBottom: 20,
+      border: "1px solid #e5e7eb",
+      zIndex: 1,
+      opacity: 0.8,
     },
     documentPageFooter: {
       position: "absolute",
@@ -836,52 +1224,84 @@ export function ApplicationForm() {
   }, [selectedExam]);
 
   async function onSubmit(data: FormValues) {
+    // Validate all fields
+    Object.keys(form.getValues()).forEach((key) => {
+      form.trigger(key as keyof FormValues)
+    })
+
     // Validate phone numbers
-    const phoneRegex = /^\+?[1-9]\d{1,14}$/;
+    const phoneRegex = /^\+?[1-9]\d{1,14}$/
 
     if (!data.whatsapp || data.whatsapp.length < 8) {
       form.setError("whatsapp", {
         type: "manual",
         message: "Please enter a valid phone number",
-      });
-      setIsSubmitting(false);
-      return;
+      })
+      setIsSubmitting(false)
+      return
     }
 
     if (!phoneRegex.test(data.emergencyContact)) {
       form.setError("emergencyContact", {
         type: "manual",
         message: "Please enter a valid phone number",
-      });
-      setIsSubmitting(false);
-      return;
+      })
+      setIsSubmitting(false)
+      return
     }
 
     if (!params.examId || !selectedExam) {
-      alert("Exam ID is missing or invalid. Please try again.");
-      setIsSubmitting(false);
-      return;
+      alert("Exam ID is missing or invalid. Please try again.")
+      setIsSubmitting(false)
+      return
     }
 
-    if (
-      signaturePreview === null ||
-      medicalLicensePreview === null ||
-      passportBioPreview === null
-    ) {
-      setWarning(true);
-      return;
+    if (signaturePreview === null || medicalLicensePreview === null || passportBioPreview === null) {
+      setWarning(true)
+      return
     } else {
-      setWarning(false);
+      setWarning(false)
     }
 
-    setIsSubmitting(true);
+    // Show confirmation dialog with custom styling
+    const result = await Swal.fire({
+      
+      html: `
+      <div style="text-align: center; margin-bottom: 20px;">
+      <img src="/icon.png" alt="MRCGP Logo" style="width: 100px; height: 100px; margin: 0 auto 15px auto;">
+      </div>
+      <h1><b>Are you sure you want to submit?</b></h1>
+        <p style="color: #666; font-size: 16px;">
+          Please review all details carefully before submission, as you won't be able to resubmit with the same candidate ID.
+        </p>
+      `,
+      // title: "Are you sure you want to submit?",
+      showCancelButton: true,
+      confirmButtonText: "Yes, please submit!",
+      cancelButtonText: "No, cancel submission!",
+      confirmButtonColor: "#4ade80",
+      cancelButtonColor: "#f87171",
+      reverseButtons: false,
+      focusConfirm: false,
+      customClass: {
+        container: "custom-swal-container",
+        popup: "custom-swal-popup",
+        title: "custom-swal-title",
+        confirmButton: "custom-swal-confirm",
+        cancelButton: "custom-swal-cancel",
+      },
+    })
 
-    const isPendingAvailable =
-      selectedExam.receivingApplicationsCount < selectedExam.applicationsLimit;
+    if (!result.isConfirmed) {
+      return
+    }
+
+    setIsSubmitting(true)
+
+    const isPendingAvailable = selectedExam.receivingApplicationsCount < selectedExam.applicationsLimit
 
     const isWaitingAvailable =
-      selectedExam.receivingApplicationsCount <
-      selectedExam.applicationsLimit + selectedExam.waitingLimit;
+      selectedExam.receivingApplicationsCount < selectedExam.applicationsLimit + selectedExam.waitingLimit
 
     const application = {
       ...data,
@@ -897,66 +1317,115 @@ export function ApplicationForm() {
       signatureUrl: signaturePreview || "",
       status: "",
       pdfUrl: "",
-      date: new Date().toISOString(), // Add the missing 'date' property
-      name: data.fullName, // Add the missing 'name' property
-      dateOfRegistration: data.dateOfRegistration
-        ? data.dateOfRegistration.toISOString()
-        : "", // Convert to string
-      preferenceDate1: data.preferenceDate1 || "", // Ensure string type
-      preferenceDate2: data.preferenceDate2 || "", // Ensure string type
-      preferenceDate3: data.preferenceDate3 || "", // Ensure string type
-    };
+      date: new Date().toISOString(),
+      name: data.fullName,
+      dateOfRegistration: data.dateOfRegistration ? data.dateOfRegistration.toISOString() : "",
+      preferenceDate1: data.preferenceDate1 || "",
+      preferenceDate2: data.preferenceDate2 || "",
+      preferenceDate3: data.preferenceDate3 || "",
+    }
 
     if (isPendingAvailable) {
-      application.status = "pending";
-      dispatch(addApplication(application));
-      dispatch(incrementApplicationsCount(params.examId));
+      application.status = "pending"
+      dispatch(addApplication(application))
+      dispatch(incrementApplicationsCount(params.examId))
+
+      // Show success dialog with custom styling
       Swal.fire({
-        title: "Success!",
-        text: "Form submitted successfully!",
-        icon: "success",
-        confirmButtonText: "Download PDF",
-        showCancelButton: true,
-        cancelButtonText: "Close",
-        confirmButtonColor: "#6366f1",
+        html: `
+        <div style="text-align: center; margin-bottom: 20px;">
+        <img src="/icon.png" alt="MRCGP Logo" style="width: 100px; height: 100px; margin: 0 auto 15px auto;">
+        </div>
+        <h1><b>Form Successfully Submitted!</b></h1>
+        <p style="color: #666; font-size: 16px;">
+        You should receive an email of acknowledgement within 24 hours of form submission otherwise please 
+        <a href="mailto:contact@mrcgpintsouthasia.org" style="color: #818cf8; text-decoration: underline;">contact</a> the office
+        </p>
+        <p style="color: #666; font-size: 16px; margin-top: 15px;">
+        For preview final PDF 
+        <a href="#" id="pdf-preview-link" style="color: #818cf8; text-decoration: underline;">Click Me</a>
+        </p>
+        `,
+        // title: "Form Successfully Submitted!",
+        confirmButtonText: "OK",
+        confirmButtonColor: "#3b82f6",
+        customClass: {
+          container: "custom-swal-container",
+          popup: "custom-swal-popup",
+          title: "custom-swal-title",
+          confirmButton: "custom-swal-confirm",
+        },
+        didOpen: () => {
+          // Add event listener to the PDF preview link
+          document.getElementById("pdf-preview-link")?.addEventListener("click", (e) => {
+            e.preventDefault()
+            document.getElementById("pdf-download-link")?.click()
+          })
+        },
       }).then((result) => {
         if (result.isConfirmed) {
-          document.getElementById("pdf-download-link")?.click();
           setTimeout(() => {
-            window.location.reload();
-          }, 10000);
+            window.location.reload()
+          }, 2000)
         }
-      });
+      })
     } else if (isWaitingAvailable) {
-      application.status = "waiting";
-      dispatch(addApplication(application));
-      dispatch(incrementApplicationsCount(params.examId));
+      application.status = "waiting"
+      dispatch(addApplication(application))
+      dispatch(incrementApplicationsCount(params.examId))
+
+      // Show success dialog with custom styling
       Swal.fire({
-        title: "Success!",
-        text: "Form submitted successfully! (Added to waiting list)",
-        icon: "success",
-        confirmButtonText: "Download PDF",
-        showCancelButton: true,
-        cancelButtonText: "Close",
-        confirmButtonColor: "#6366f1",
+        title: "Form Successfully Submitted!",
+        html: `
+          <div style="text-align: center; margin-bottom: 20px;">
+            <img src="/icon.png" alt="MRCGP Logo" style="width: 100px; height: 100px; margin: 0 auto 15px auto;">
+          </div>
+          <p style="color: #666; font-size: 16px;">
+            You should receive an email of acknowledgement within 24 hours of form submission otherwise please 
+            <a href="mailto:contact@mrcgpintsouthasia.org" style="color: #818cf8; text-decoration: underline;">contact</a> the office
+          </p>
+          <p style="color: #666; font-size: 16px; margin-top: 15px;">
+            <strong>Note:</strong> Your application has been added to the waiting list.
+          </p>
+          <p style="color: #666; font-size: 16px; margin-top: 15px;">
+            For preview final PDF 
+            <a href="#" id="pdf-preview-link" style="color: #818cf8; text-decoration: underline;">Click Me</a>
+          </p>
+        `,
+        confirmButtonText: "OK",
+        confirmButtonColor: "#3b82f6",
+        customClass: {
+          container: "custom-swal-container",
+          popup: "custom-swal-popup",
+          title: "custom-swal-title",
+          confirmButton: "custom-swal-confirm",
+        },
+        didOpen: () => {
+          // Add event listener to the PDF preview link
+          document.getElementById("pdf-preview-link")?.addEventListener("click", (e) => {
+            e.preventDefault()
+            document.getElementById("pdf-download-link")?.click()
+          })
+        },
       }).then((result) => {
         if (result.isConfirmed) {
-          document.getElementById("pdf-download-link")?.click();
           setTimeout(() => {
-            window.location.reload();
-          }, 10000);
+            window.location.reload()
+          }, 2000)
         }
-      });
+      })
     } else {
-      dispatch(toggleBlockExam(params.examId));
+      dispatch(toggleBlockExam(params.examId))
       Swal.fire({
         title: "Error",
         text: "No more slots available for this exam.",
         icon: "error",
         confirmButtonColor: "#6366f1",
-      });
+      })
     }
-    setIsSubmitting(false);
+
+    setIsSubmitting(false)
   }
 
   const validateFile = async (file: File, inputId: string) => {
@@ -1081,15 +1550,18 @@ export function ApplicationForm() {
   useEffect(() => {
     const subscription = form.watch((value) => {
       setSelectedDates({
-        preferenceDate1: value.preferenceDate1 && value.preferenceDate1 !== " "
-          ? new Date(value.preferenceDate1)?.toISOString()
-          : null,
-        preferenceDate2: value.preferenceDate2 && value.preferenceDate2 !== " "
-          ? new Date(value.preferenceDate2)?.toISOString()
-          : null,
-        preferenceDate3: value.preferenceDate3 && value.preferenceDate3 !== " "
-          ? new Date(value.preferenceDate3)?.toISOString()
-          : null,
+        preferenceDate1:
+          value.preferenceDate1 && value.preferenceDate1 !== " "
+            ? new Date(value.preferenceDate1)?.toISOString()
+            : null,
+        preferenceDate2:
+          value.preferenceDate2 && value.preferenceDate2 !== " "
+            ? new Date(value.preferenceDate2)?.toISOString()
+            : null,
+        preferenceDate3:
+          value.preferenceDate3 && value.preferenceDate3 !== " "
+            ? new Date(value.preferenceDate3)?.toISOString()
+            : null,
       });
     });
 
@@ -1133,12 +1605,9 @@ export function ApplicationForm() {
     } else {
       setError(null);
     }
-  }; 
+  };
 
-  function test() {
-    
-    
-  }
+  function test() {}
 
   if (isExamClosed) {
     return <ExamClosed />;
@@ -1218,7 +1687,11 @@ export function ApplicationForm() {
                                     field.onChange(value);
                                   }
                                 }}
-                                className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus-visible:ring-indigo-500"
+                                className={`bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus-visible:ring-indigo-500 ${
+                                  form.formState.errors.fullName
+                                    ? "border-red-500 dark:border-red-700"
+                                    : ""
+                                }`}
                               />
                             </FormControl>
                             <FormMessage />
@@ -1312,7 +1785,11 @@ export function ApplicationForm() {
                               <Input
                                 placeholder="Enter Full Name"
                                 {...field}
-                                className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus-visible:ring-indigo-500"
+                                className={`bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus-visible:ring-indigo-500 ${
+                                  form.formState.errors.fullName
+                                    ? "border-red-500 dark:border-red-700"
+                                    : ""
+                                }`}
                               />
                             </FormControl>
                             <FormMessage />
@@ -1340,7 +1817,11 @@ export function ApplicationForm() {
                                   <Input
                                     placeholder="Enter P.O.Box"
                                     {...field}
-                                    className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus-visible:ring-indigo-500"
+                                    className={`bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus-visible:ring-indigo-500 ${
+                                      form.formState.errors.fullName
+                                        ? "border-red-500 dark:border-red-700"
+                                        : ""
+                                    }`}
                                   />
                                 </FormControl>
                                 <FormMessage />
@@ -1361,7 +1842,11 @@ export function ApplicationForm() {
                                   <Input
                                     placeholder="Enter District"
                                     {...field}
-                                    className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus-visible:ring-indigo-500"
+                                    className={`bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus-visible:ring-indigo-500 ${
+                                      form.formState.errors.fullName
+                                        ? "border-red-500 dark:border-red-700"
+                                        : ""
+                                    }`}
                                   />
                                 </FormControl>
                                 <FormMessage />
@@ -1382,7 +1867,11 @@ export function ApplicationForm() {
                                   <Input
                                     placeholder="Enter City / Town / Village"
                                     {...field}
-                                    className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus-visible:ring-indigo-500"
+                                    className={`bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus-visible:ring-indigo-500 ${
+                                      form.formState.errors.fullName
+                                        ? "border-red-500 dark:border-red-700"
+                                        : ""
+                                    }`}
                                   />
                                 </FormControl>
                                 <FormMessage />
@@ -1403,7 +1892,11 @@ export function ApplicationForm() {
                                   <Input
                                     placeholder="Enter Province / Region"
                                     {...field}
-                                    className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus-visible:ring-indigo-500"
+                                    className={`bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus-visible:ring-indigo-500 ${
+                                      form.formState.errors.fullName
+                                        ? "border-red-500 dark:border-red-700"
+                                        : ""
+                                    }`}
                                   />
                                 </FormControl>
                                 <FormMessage />
@@ -1424,7 +1917,11 @@ export function ApplicationForm() {
                                   <Input
                                     placeholder="Enter Country"
                                     {...field}
-                                    className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus-visible:ring-indigo-500"
+                                    className={`bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus-visible:ring-indigo-500 ${
+                                      form.formState.errors.fullName
+                                        ? "border-red-500 dark:border-red-700"
+                                        : ""
+                                    }`}
                                   />
                                 </FormControl>
                                 <FormMessage />
@@ -1448,7 +1945,13 @@ export function ApplicationForm() {
                               </FormLabel>
                               {/* <FormDescription>In full international format</FormDescription> */}
                               <FormControl>
-                                <div className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2">
+                                <div
+                                  className={`bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 ${
+                                    form.formState.errors.whatsapp
+                                      ? "border-red-500 dark:border-red-700"
+                                      : ""
+                                  }`}
+                                >
                                   <PhoneInput
                                     international
                                     countryCallingCodeEditable={true}
@@ -1484,7 +1987,13 @@ export function ApplicationForm() {
                               </FormLabel>
                               {/* <FormDescription>In full international format</FormDescription> */}
                               <FormControl>
-                                <div className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2">
+                                <div
+                                  className={`bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 ${
+                                    form.formState.errors.whatsapp
+                                      ? "border-red-500 dark:border-red-700"
+                                      : ""
+                                  }`}
+                                >
                                   <PhoneInput
                                     international
                                     countryCallingCodeEditable={true}
@@ -1526,7 +2035,11 @@ export function ApplicationForm() {
                                   placeholder="Enter Email"
                                   type="email"
                                   {...field}
-                                  className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus-visible:ring-indigo-500"
+                                  className={`bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus-visible:ring-indigo-500 ${
+                                    form.formState.errors.fullName
+                                      ? "border-red-500 dark:border-red-700"
+                                      : ""
+                                  }`}
                                 />
                               </FormControl>
                               <FormMessage />
@@ -1551,7 +2064,13 @@ export function ApplicationForm() {
                                 defaultValue={field.value}
                               >
                                 <FormControl>
-                                  <SelectTrigger className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus-visible:ring-indigo-500">
+                                  <SelectTrigger
+                                    className={`bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus-visible:ring-indigo-500 ${
+                                      form.formState.errors.fullName
+                                        ? "border-red-500 dark:border-red-700"
+                                        : ""
+                                    }`}
+                                  >
                                     <SelectValue placeholder="Select date" />
                                   </SelectTrigger>
                                 </FormControl>
@@ -1587,7 +2106,13 @@ export function ApplicationForm() {
                                 defaultValue={field.value}
                               >
                                 <FormControl>
-                                  <SelectTrigger className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus-visible:ring-indigo-500">
+                                  <SelectTrigger
+                                    className={`bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus-visible:ring-indigo-500 ${
+                                      form.formState.errors.fullName
+                                        ? "border-red-500 dark:border-red-700"
+                                        : ""
+                                    }`}
+                                  >
                                     <SelectValue placeholder="Select number" />
                                   </SelectTrigger>
                                 </FormControl>
@@ -1655,7 +2180,11 @@ export function ApplicationForm() {
                                 <Input
                                   placeholder="Enter country of postgraduate clinical experience"
                                   {...field}
-                                  className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus-visible:ring-indigo-500"
+                                  className={`bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus-visible:ring-indigo-500 ${
+                                    form.formState.errors.fullName
+                                      ? "border-red-500 dark:border-red-700"
+                                      : ""
+                                  }`}
                                 />
                               </FormControl>
                               <FormMessage />
@@ -1676,7 +2205,11 @@ export function ApplicationForm() {
                                 <Input
                                   placeholder="Enter Country of ethnic origin"
                                   {...field}
-                                  className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus-visible:ring-indigo-500"
+                                  className={`bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus-visible:ring-indigo-500 ${
+                                    form.formState.errors.fullName
+                                      ? "border-red-500 dark:border-red-700"
+                                      : ""
+                                  }`}
                                 />
                               </FormControl>
                               <FormMessage />
@@ -1697,7 +2230,11 @@ export function ApplicationForm() {
                                 <Input
                                   placeholder="Enter Registration authority"
                                   {...field}
-                                  className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus-visible:ring-indigo-500"
+                                  className={`bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus-visible:ring-indigo-500 ${
+                                    form.formState.errors.fullName
+                                      ? "border-red-500 dark:border-red-700"
+                                      : ""
+                                  }`}
                                 />
                               </FormControl>
                               <FormMessage />
@@ -1718,7 +2255,11 @@ export function ApplicationForm() {
                                 <Input
                                   placeholder="Enter Registration number"
                                   {...field}
-                                  className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus-visible:ring-indigo-500"
+                                  className={`bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus-visible:ring-indigo-500 ${
+                                    form.formState.errors.fullName
+                                      ? "border-red-500 dark:border-red-700"
+                                      : ""
+                                  }`}
                                 />
                               </FormControl>
                               <FormMessage />
@@ -1823,7 +2364,13 @@ export function ApplicationForm() {
                               <FormLabel>Preference Date 1</FormLabel>
                               <Select onValueChange={field.onChange}>
                                 <FormControl>
-                                  <SelectTrigger className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus-visible:ring-indigo-500">
+                                  <SelectTrigger
+                                    className={`bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus-visible:ring-indigo-500 ${
+                                      form.formState.errors.fullName
+                                        ? "border-red-500 dark:border-red-700"
+                                        : ""
+                                    }`}
+                                  >
                                     <SelectValue placeholder="Select a date" />
                                   </SelectTrigger>
                                 </FormControl>
@@ -1856,7 +2403,13 @@ export function ApplicationForm() {
                               <FormLabel>Preference Date 2</FormLabel>
                               <Select onValueChange={field.onChange}>
                                 <FormControl>
-                                  <SelectTrigger className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus-visible:ring-indigo-500">
+                                  <SelectTrigger
+                                    className={`bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus-visible:ring-indigo-500 ${
+                                      form.formState.errors.fullName
+                                        ? "border-red-500 dark:border-red-700"
+                                        : ""
+                                    }`}
+                                  >
                                     <SelectValue placeholder="Select a date" />
                                   </SelectTrigger>
                                 </FormControl>
@@ -1889,7 +2442,13 @@ export function ApplicationForm() {
                               <FormLabel>Preference Date 3</FormLabel>
                               <Select onValueChange={field.onChange}>
                                 <FormControl>
-                                  <SelectTrigger className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus-visible:ring-indigo-500">
+                                  <SelectTrigger
+                                    className={`bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus-visible:ring-indigo-500 ${
+                                      form.formState.errors.fullName
+                                        ? "border-red-500 dark:border-red-700"
+                                        : ""
+                                    }`}
+                                  >
                                     <SelectValue placeholder="Select a date" />
                                   </SelectTrigger>
                                 </FormControl>
@@ -2100,9 +2659,10 @@ export function ApplicationForm() {
                                 <label
                                   htmlFor="medical-license"
                                   className={
-                                    warning
-                                      ? "border-red-700 flex flex-col items-center justify-center w-full h-24 border-2 border-dashed rounded-lg cursor-pointer bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 "
-                                      : "flex flex-col items-center justify-center w-full h-24 border-2 border-dashed rounded-lg cursor-pointer bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 "
+                                    warning ||
+                                    form.formState.errors.medicalLicense
+                                      ? "border-red-500 flex flex-col items-center justify-center w-full h-24 border-2 border-dashed rounded-lg cursor-pointer bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700"
+                                      : "flex flex-col items-center justify-center w-full h-24 border-2 border-dashed rounded-lg cursor-pointer bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700"
                                   }
                                 >
                                   <div
@@ -2251,9 +2811,10 @@ export function ApplicationForm() {
                                 <label
                                   htmlFor="passport-bio"
                                   className={
-                                    warning
-                                      ? "border-red-700 flex flex-col items-center justify-center w-full h-24 border-2 border-dashed rounded-lg cursor-pointer bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 "
-                                      : "flex flex-col items-center justify-center w-full h-24 border-2 border-dashed rounded-lg cursor-pointer bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 "
+                                    warning ||
+                                    form.formState.errors.medicalLicense
+                                      ? "border-red-500 flex flex-col items-center justify-center w-full h-24 border-2 border-dashed rounded-lg cursor-pointer bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700"
+                                      : "flex flex-col items-center justify-center w-full h-24 border-2 border-dashed rounded-lg cursor-pointer bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700"
                                   }
                                 >
                                   <div className="flex flex-col items-center justify-center pt-5 pb-6">
@@ -2322,9 +2883,10 @@ export function ApplicationForm() {
                                 <label
                                   htmlFor="signature"
                                   className={
-                                    warning
-                                      ? "border-red-700 flex flex-col items-center justify-center w-full h-24 border-2 border-dashed rounded-lg cursor-pointer bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 "
-                                      : "flex flex-col items-center justify-center w-full h-24 border-2 border-dashed rounded-lg cursor-pointer bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 "
+                                    warning ||
+                                    form.formState.errors.medicalLicense
+                                      ? "border-red-500 flex flex-col items-center justify-center w-full h-24 border-2 border-dashed rounded-lg cursor-pointer bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700"
+                                      : "flex flex-col items-center justify-center w-full h-24 border-2 border-dashed rounded-lg cursor-pointer bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700"
                                   }
                                 >
                                   <div className="flex flex-col items-center justify-center pt-5 pb-6">
@@ -2370,7 +2932,11 @@ export function ApplicationForm() {
                                   <Input
                                     placeholder="Enter Full name"
                                     {...field}
-                                    className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus-visible:ring-indigo-500"
+                                    className={`bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus-visible:ring-indigo-500 ${
+                                      form.formState.errors.fullName
+                                        ? "border-red-500 dark:border-red-700"
+                                        : ""
+                                    }`}
                                   />
                                 </FormControl>
                                 <FormMessage />
@@ -2459,10 +3025,36 @@ export function ApplicationForm() {
                     </>
                   )}
                 </PDFDownloadLink>
+                <PDFDownloadLink
+                  id="pdf-download-preview-link"
+                  document={
+                    <ApplicationPDFCompletePreview
+                      data={form.getValues()}
+                      images={pdfImages}
+                    />
+                  }
+                  fileName="MRCGP_Application_Form.pdf"
+                  className="hidden"
+                >
+                  {({ loading }) => (
+                    <>
+                      {loading || pdfGenerating ? (
+                        <>
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          Generating PDF...
+                        </>
+                      ) : (
+                        <>
+                          <Eye className="h-4 w-4 mr-2" />
+                          Preview
+                        </>
+                      )}
+                    </>
+                  )}
+                </PDFDownloadLink>
                 <Button
                   type="button"
                   variant="outline"
-                  
                   onClick={() => {
                     form.handleSubmit(test)();
                     // Check if all required fields are filled
@@ -2480,7 +3072,7 @@ export function ApplicationForm() {
                     // Create a new window to open the PDF
                     setTimeout(() => {
                       const pdfBlob =
-                        document.getElementById("pdf-download-link");
+                        document.getElementById("pdf-download-preview-link");
                       if (pdfBlob) {
                         // @ts-ignore
                         const pdfUrl = pdfBlob.href;

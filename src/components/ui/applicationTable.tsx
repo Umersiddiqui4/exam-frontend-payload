@@ -878,7 +878,7 @@ export default function ApplicationTable() {
                     </Button>
                   </div>
                 </CardHeader>
-                <CardContent className="p-0">
+                <CardContent className="p-0 ">
                   <div className="p-4 dark:bg-slate-900">
                     <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 gap-4">
                       <div className="flex items-center space-x-2 flex-wrap gap-2">
@@ -977,7 +977,7 @@ export default function ApplicationTable() {
 
                     {/* Selected Exam Info */}
                     {selectedExam !== "all" && (
-                      <div className="mb-4 p-3 bg-indigo-50 dark:bg-indigo-900/20 rounded-md border border-indigo-100 dark:border-indigo-800">
+                      <div className="mb-4 p-3  bg-indigo-50 dark:bg-indigo-900/20 rounded-md border border-indigo-100 dark:border-indigo-800">
                         <div className="flex items-center">
                           <Calendar className="h-5 w-5 mr-2 text-indigo-500 dark:text-indigo-400" />
                           <span className="font-medium dark:text-slate-200">

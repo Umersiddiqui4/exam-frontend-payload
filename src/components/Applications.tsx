@@ -1,0 +1,155 @@
+import {
+  FileText,
+  LayoutDashboard,
+  Menu,
+  Moon,
+  Settings,
+  Sun,
+  UserSquare,
+  X,
+} from "lucide-react";
+import { Button } from "./ui/button";
+import { useNavigate } from "react-router-dom";
+import { useMobile } from "../hooks/use-mobile";
+import { useTheme } from "./theme-provider";
+import { useState } from "react";
+import ApplicationTable from "./ui/applicationTable";
+
+export default function Applications() {
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const { theme, setTheme } = useTheme();
+  const navigate = useNavigate();
+  const isMobile = useMobile();
+
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
+  };
+  const toggleTheme = () => {
+    const newTheme = theme === "dark" ? "light" : "dark";
+    setTheme(newTheme);
+    // Force theme update by setting a data attribute on document.documentElement
+    if (typeof window !== "undefined") {
+      document.documentElement.setAttribute("data-theme", newTheme);
+    }
+  };
+
+  function nav(props: string) {
+    navigate(props);
+  }
+
+  return (
+    <div className="flex h-screen bg-background transition-all duration-300 ease-in-out">
+      {/* Sidebar - transforms to top navbar on mobile */}
+      {sidebarOpen && (
+        <div
+          className={`${isMobile ? "fixed top-0 left-0 z-50 w-64 h-full" : "w-64"
+            } bg-slate-800 text-slate-100 shadow-lg transition-all duration-300 dark:bg-slate-900`}
+        >
+          <div className="p-4 flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
+                <img src="/icon.png" alt="404" />
+              </div>
+              <span className="font-bold text-lg">MRCGP INT. </span>
+            </div>
+            {isMobile && (
+              <Button variant="ghost" size="icon" onClick={toggleSidebar}>
+                <X className="h-5 w-5" />
+              </Button>
+            )}
+          </div>
+
+          <nav className="mt-6 px-4">
+            <ul className="space-y-2">
+              <li>
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start text-slate-100 hover:bg-slate-700/50 dark:hover:bg-slate-800/50"
+                  onClick={() => nav("/")}
+                >
+                  <LayoutDashboard className="mr-2 h-5 w-5" />
+                  Dashboard
+                </Button>
+              </li>
+              <li>
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start text-slate-100 bg-slate-500/50 dark:bg-slate-600/50"
+                  onClick={() => nav("/applications")}
+                >
+                  <FileText className="mr-2 h-5 w-5" />
+                  Applications
+                </Button>
+              </li>
+              <li>
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start text-slate-100 hover:bg-slate-700/50 dark:hover:bg-slate-800/50"
+                  onClick={() => nav("/exam")}
+                >
+                  <UserSquare className="mr-2 h-5 w-5" />
+                  
+                  Exams
+                </Button>
+              </li>
+              <li>
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start text-slate-100 hover:bg-slate-700/50 dark:hover:bg-slate-800/50"
+                >
+                  <Settings className="mr-2 h-5 w-5" />
+                  Settings
+                </Button>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      )}
+
+      {/* Main content */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Top navbar */}
+        <header className="bg-slate-800 text-slate-100 h-16 flex items-center px-4 shadow-md dark:bg-slate-900">
+          {!sidebarOpen && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleSidebar}
+              className="mr-2 text-slate-100  hover:bg-slate-700/50 dark:hover:bg-slate-800/50"
+            >
+              <Menu className="h-5 w-5" />
+            </Button>
+          )}
+
+          <div className="flex-1 flex items-center justify-between">
+            <h1 className="text-xl font-bold">Applications</h1>
+
+            <div className="flex items-center space-x-4 " >
+              {!isMobile && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="bg-transparent rounded-full p-2  border-slate-600 text-slate-100 hover:bg-slate-700/50 dark:hover:bg-slate-800/50"
+                  onClick={toggleTheme}
+                >
+                  {theme === "dark" ? (
+                    <Sun className="h-4 w-4" />
+                  ) : (
+                    <Moon className="h-4 w-4" />
+                  )}
+                </Button>
+              )}
+
+              <div className="w-8 h-8 rounded-full overflow-hidden bg-slate-100 flex items-center justify-center">
+                <img src="/profile.png" alt="404" />
+              </div>
+            </div>
+          </div>
+        </header>
+        <main className="flex-1 overflow-y-auto p-4 bg-slate-50 dark:bg-slate-950">
+          <ApplicationTable />
+        </main>
+      </div>
+    </div>
+  );
+}
