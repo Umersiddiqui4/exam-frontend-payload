@@ -1,10 +1,8 @@
 "use client";
 
 import { Card } from "@/components/ui/card";
-import { useState } from "react";
 
 export default function ExamClosedApp() {
-  const [activeTab] = useState("notification1");
 
   return (
     <div className="min-h-screen w-full bg-gray-50 flex flex-col items-center justify-center p-4">
@@ -28,16 +26,9 @@ export default function ExamClosedApp() {
           </div>
         </Card>
 
-        <div className="mt-8 text-center">
-          <p className="text-sm text-gray-500">
-            Currently viewing:{" "}
-            {activeTab === "notification1"
-              ? "March-2025 Exam Closure"
-              : "Submission Date Expiry"}
-          </p>
-        </div>
+        
 
-        <footer className="mt-8 text-center text-sm text-gray-500">
+        <footer className="text-center text-sm text-gray-500 flex justify-center w-full left-0  items-center absolute bottom-10 m-auto">
           <p>
             © {new Date().getFullYear()} MRCGP[INT] South Asia. All rights
             reserved.
