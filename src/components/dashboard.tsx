@@ -206,46 +206,7 @@ export function Dashboard() {
         <main className="flex-1 overflow-y-auto p-4 bg-slate-50 dark:bg-slate-950">
           <Tabs defaultValue="applications" className="w-full">
             <TabsContent value="applications">
-                <div className="text-3xl p-3">Current Batch Status</div>
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-6">
-                <StatusCard
-                  title="Total Requests"
-                  value={applications.length}
-                  color="bg-slate-600 dark:bg-slate-700"
-                  onClick={() => setActiveFilter("all")}
-                  active={activeFilter === "all"}
-                />
-                <StatusCard
-                  title="Pending Requests"
-                  value={
-                    applications.filter((app) => app.status === "pending")
-                      .length
-                  }
-                  color="bg-amber-600 dark:bg-amber-700"
-                  onClick={() => setActiveFilter("pending")}
-                  active={activeFilter === "pending"}
-                />
-                <StatusCard
-                  title="Approved Requests"
-                  value={
-                    applications.filter((app) => app.status === "approved")
-                      .length
-                  }
-                  color="bg-green-600 dark:bg-green-700"
-                  onClick={() => setActiveFilter("approved")}
-                  active={activeFilter === "approved"}
-                />
-                <StatusCard
-                  title="Rejected Requests"
-                  value={
-                    applications.filter((app) => app.status === "rejected")
-                      .length
-                  }
-                  color="bg-red-600 dark:bg-red-700"
-                  onClick={() => setActiveFilter("rejected")}
-                  active={activeFilter === "rejected"}
-                />
-              </div>
+                
               <div className="text-3xl p-3">All Batch Status</div>
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-6">
                 <StatusCard
@@ -284,6 +245,46 @@ export function Dashboard() {
                   color="bg-red-600 dark:bg-red-700"
                   onClick={() => setActiveFilter("totalRejected")}
                   active={activeFilter === "totalRejected"}
+                />
+              </div>
+              <div className="text-3xl p-3">Current Batch Status</div>
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-6">
+                <StatusCard
+                  title="Total Requests"
+                  value={applications.length}
+                  color="bg-slate-600 dark:bg-slate-700"
+                  onClick={() => setActiveFilter("all")}
+                  active={activeFilter === "all"}
+                />
+                <StatusCard
+                  title="Pending Requests"
+                  value={
+                    applications.filter((app) => app.status === "pending")
+                      .length
+                  }
+                  color="bg-amber-600 dark:bg-amber-700"
+                  onClick={() => setActiveFilter("pending")}
+                  active={activeFilter === "pending"}
+                />
+                <StatusCard
+                  title="Approved Requests"
+                  value={
+                    applications.filter((app) => app.status === "approved")
+                      .length
+                  }
+                  color="bg-green-600 dark:bg-green-700"
+                  onClick={() => setActiveFilter("approved")}
+                  active={activeFilter === "approved"}
+                />
+                <StatusCard
+                  title="Rejected Requests"
+                  value={
+                    applications.filter((app) => app.status === "rejected")
+                      .length
+                  }
+                  color="bg-red-600 dark:bg-red-700"
+                  onClick={() => setActiveFilter("rejected")}
+                  active={activeFilter === "rejected"}
                 />
               </div>
             </TabsContent>
