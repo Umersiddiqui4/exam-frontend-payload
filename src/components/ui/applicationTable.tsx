@@ -42,6 +42,7 @@ import { selectApplications, setApplicationStatus } from "@/redux/applicationsSl
 import { ApplicationData, columns } from "../columns";
 import { format } from "date-fns";
 import { pdf } from "@react-pdf/renderer";
+import Swal from "sweetalert2";
 
 export default function ApplicationTable() {
 
@@ -98,13 +99,79 @@ export default function ApplicationTable() {
           );
         },
       };
+
+      const handleStatusChange = async (id: string, status: "approved" | "rejected") => {
+        if (status === "approved") {
+          // Show approval confirmation dialog
+          const result = await Swal.fire({
+            title: "Are you sure you want to approve?",
+            imageUrl: "/icon.png", // Replace with your actual icon path
+            imageWidth: 150,
+            imageHeight: 150,
+            showCancelButton: true,
+            confirmButtonText: "Yes, please approve",
+            cancelButtonText: "Cancel",
+            confirmButtonColor: "#4ade80",
+            cancelButtonColor: "#ef4444",
+            customClass: {
+              popup: "rounded-lg",
+              confirmButton: "rounded-lg px-4 py-2",
+              cancelButton: "rounded-lg px-4 py-2",
+            },
+          })
     
-      const handleStatusChange = (
-        id: string,
-        newStatus: "approved" | "rejected"
-      ) => {
-        dispatch(setApplicationStatus({ id, status: newStatus }));
-      };
+          if (result.isConfirmed) {
+            // Call the status change handler
+            dispatch(setApplicationStatus({ id, status }));
+    
+            // Show success message
+            await Swal.fire({
+              title: "Updated Successfully!",
+              imageUrl: "/icon.png", // Replace with your actual icon path
+              imageWidth: 150,
+              imageHeight: 150,
+              confirmButtonText: "OK",
+              confirmButtonColor: "#3b82f6",
+              customClass: {
+                popup: "rounded-lg",
+                confirmButton: "rounded-lg px-4 py-2",
+              },
+            })
+          }
+        } else if (status === "rejected") {
+          // Show rejection confirmation dialog with reason input
+          const result = await Swal.fire({
+            title: "Are you sure you want to reject?",
+            imageUrl: "/icon.png", // Replace with your actual logo path
+            imageWidth: 150,
+            imageHeight: 150,
+            input: "text",
+            inputPlaceholder: "Enter reason...",
+            showCancelButton: true,
+            confirmButtonText: "Yes, please reject!",
+            cancelButtonText: "Cancel",
+            confirmButtonColor: "#4ade80",
+            cancelButtonColor: "#ef4444",
+            customClass: {
+              popup: "rounded-lg",
+              input: "border rounded-lg p-2 w-auto",
+              confirmButton: "rounded-lg px-4 py-2",
+              cancelButton: "rounded-lg px-4 py-2",
+            },
+          })
+    
+          if (result.isConfirmed) {
+            dispatch(setApplicationStatus({ id, status }));
+          }
+        }
+      }
+    
+      // const handleStatusChange = (
+      //   id: string,
+      //   newStatus: "approved" | "rejected"
+      // ) => {
+      //   dispatch(setApplicationStatus({ id, status: newStatus }));
+      // };
     
       const handleExamChange = (value: string) => {
         setSelectedExam(value);
