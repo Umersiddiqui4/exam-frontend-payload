@@ -10,7 +10,6 @@ import {
   Sun,
   Menu,
   X,
-  UserSquare2,
   UserSquare,
 } from "lucide-react";
 
