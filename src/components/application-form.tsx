@@ -93,6 +93,59 @@ import "../App.css";
 import { isValidPhoneNumber } from "libphonenumber-js";
 
 // Form schema
+const formSchemavalid = z.object({
+  candidateId: z
+    .string()
+    .length(7, "Candidate ID must be exactly 7 numbers")
+    .regex(/^\d+$/, "Candidate ID must contain only numbers"),
+  fullName: z.string().min(2, "Full name is required"),
+
+  // Address
+  poBox: z.string().min(1, "P.O. Box is required"),
+  district: z.string().min(1, "District is required"),
+  city: z.string().min(1, "City is required"),
+  province: z.string().min(1, "Province is required"),
+  country: z.string().min(1, "Country is required"),
+
+  // Contact
+  whatsapp: z.string().min(5, "WhatsApp number is required"),
+  emergencyContact: z.string().min(5, "Emergency contact is required"),
+  email: z.string().email("Invalid email address"),
+
+  // Experience
+  dateOfPassingPart1: z
+    .string()
+    .min(1, "Date of passing Part 1 exam is required"),
+  previousOsceAttempts: z
+    .string()
+    .min(1, "Number of previous OSCE attempts is required"),
+
+  // Experience and License
+  countryOfExperience: z.string().min(1, "Country of experience is required"),
+  countryOfOrigin: z.string().min(1, "Country of origin is required"),
+  registrationAuthority: z
+    .string()
+    .min(1, "Registration authority is required"),
+  registrationNumber: z.string().min(1, "Registration number is required"),
+  dateOfRegistration: z.date({
+    required_error: "Date of registration is required",
+  }),
+
+
+  // Uploads
+  part1PassingEmail: z.any().optional(),
+  medicalLicense: z.any(),
+  passportBioPage: z.any(),
+  signature: z.any(),
+
+
+  agreementDate: z.date({
+    required_error: "Date is required",
+  }),
+  termsAgreed: z.boolean().refine((val) => val === true, {
+    message: "You must agree to the terms and conditions",
+  }),
+});
 const formSchema = z.object({
   candidateId: z
     .string()
@@ -144,7 +197,7 @@ const formSchema = z.object({
   signature: z.any(),
 
   // Agreement
-  agreementName: z.string().min(2, "Full name is required"),
+  agreementName: z.string().optional(),
   agreementDate: z.date({
     required_error: "Date is required",
   }),
@@ -154,6 +207,7 @@ const formSchema = z.object({
 });
 
 type FormValues = z.infer<typeof formSchema>;
+type FormValuesValid = z.infer<typeof formSchemavalid>;
 
 // Part 1 exam dates
 const part1ExamDates = [
@@ -1226,7 +1280,7 @@ export function ApplicationForm() {
   async function onSubmit(data: FormValues) {
     // Validate all fields
     Object.keys(form.getValues()).forEach((key) => {
-      form.trigger(key as keyof FormValues)
+      form.trigger(key as keyof FormValuesValid)
     })
 
     // Validate phone numbers
@@ -1607,7 +1661,18 @@ export function ApplicationForm() {
     }
   };
 
-  function test() {}
+  function test() {
+    setTimeout(() => {
+      const pdfBlob =
+        document.getElementById("pdf-download-preview-link");
+      if (pdfBlob) {
+        // @ts-ignore
+        const pdfUrl = pdfBlob.href;
+        window.open(pdfUrl, "_blank");
+      }
+    }, 200);
+    
+  }
 
   if (isExamClosed) {
     return <ExamClosed />;
@@ -2365,11 +2430,7 @@ export function ApplicationForm() {
                               <Select onValueChange={field.onChange}>
                                 <FormControl>
                                   <SelectTrigger
-                                    className={`bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus-visible:ring-indigo-500 ${
-                                      form.formState.errors.fullName
-                                        ? "border-red-500 dark:border-red-700"
-                                        : ""
-                                    }`}
+                                    className={`bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus-visible:ring-indigo-500`}
                                   >
                                     <SelectValue placeholder="Select a date" />
                                   </SelectTrigger>
@@ -2404,11 +2465,7 @@ export function ApplicationForm() {
                               <Select onValueChange={field.onChange}>
                                 <FormControl>
                                   <SelectTrigger
-                                    className={`bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus-visible:ring-indigo-500 ${
-                                      form.formState.errors.fullName
-                                        ? "border-red-500 dark:border-red-700"
-                                        : ""
-                                    }`}
+                                    className={`bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus-visible:ring-indigo-500 `}
                                   >
                                     <SelectValue placeholder="Select a date" />
                                   </SelectTrigger>
@@ -2443,11 +2500,7 @@ export function ApplicationForm() {
                               <Select onValueChange={field.onChange}>
                                 <FormControl>
                                   <SelectTrigger
-                                    className={`bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus-visible:ring-indigo-500 ${
-                                      form.formState.errors.fullName
-                                        ? "border-red-500 dark:border-red-700"
-                                        : ""
-                                    }`}
+                                    className={`bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus-visible:ring-indigo-500`}
                                   >
                                     <SelectValue placeholder="Select a date" />
                                   </SelectTrigger>
@@ -2926,17 +2979,13 @@ export function ApplicationForm() {
                               <FormItem>
                                 <FormLabel>
                                   Full name:{" "}
-                                  <span className="text-red-500">*</span>
+                              
                                 </FormLabel>
                                 <FormControl>
                                   <Input
                                     placeholder="Enter Full name"
                                     {...field}
-                                    className={`bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus-visible:ring-indigo-500 ${
-                                      form.formState.errors.fullName
-                                        ? "border-red-500 dark:border-red-700"
-                                        : ""
-                                    }`}
+                                    className={`bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus-visible:ring-indigo-500`}
                                   />
                                 </FormControl>
                                 <FormMessage />
@@ -3057,28 +3106,7 @@ export function ApplicationForm() {
                   variant="outline"
                   onClick={() => {
                     form.handleSubmit(test)();
-                    // Check if all required fields are filled
-                    const isValid = form.formState.isValid;
-                    if (!isValid) {
-                      Swal.fire({
-                        title: "Missing Information",
-                        text: "Please fill in all required fields before generating a preview",
-                        icon: "warning",
-                        confirmButtonColor: "#6366f1",
-                      });
-                      return;
-                    }
-
-                    // Create a new window to open the PDF
-                    setTimeout(() => {
-                      const pdfBlob =
-                        document.getElementById("pdf-download-preview-link");
-                      if (pdfBlob) {
-                        // @ts-ignore
-                        const pdfUrl = pdfBlob.href;
-                        window.open(pdfUrl, "_blank");
-                      }
-                    }, 500); // Increased timeout to ensure PDF generation completes
+                   
                   }}
                   className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
                 >
