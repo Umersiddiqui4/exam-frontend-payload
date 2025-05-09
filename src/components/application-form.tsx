@@ -92,60 +92,6 @@ import ExamClosed from "./ui/examClosed";
 import "../App.css";
 import { isValidPhoneNumber } from "libphonenumber-js";
 
-// Form schema
-const formSchemavalid = z.object({
-  candidateId: z
-    .string()
-    .length(7, "Candidate ID must be exactly 7 numbers")
-    .regex(/^\d+$/, "Candidate ID must contain only numbers"),
-  fullName: z.string().min(2, "Full name is required"),
-
-  // Address
-  poBox: z.string().min(1, "P.O. Box is required"),
-  district: z.string().min(1, "District is required"),
-  city: z.string().min(1, "City is required"),
-  province: z.string().min(1, "Province is required"),
-  country: z.string().min(1, "Country is required"),
-
-  // Contact
-  whatsapp: z.string().min(5, "WhatsApp number is required"),
-  emergencyContact: z.string().min(5, "Emergency contact is required"),
-  email: z.string().email("Invalid email address"),
-
-  // Experience
-  dateOfPassingPart1: z
-    .string()
-    .min(1, "Date of passing Part 1 exam is required"),
-  previousOsceAttempts: z
-    .string()
-    .min(1, "Number of previous OSCE attempts is required"),
-
-  // Experience and License
-  countryOfExperience: z.string().min(1, "Country of experience is required"),
-  countryOfOrigin: z.string().min(1, "Country of origin is required"),
-  registrationAuthority: z
-    .string()
-    .min(1, "Registration authority is required"),
-  registrationNumber: z.string().min(1, "Registration number is required"),
-  dateOfRegistration: z.date({
-    required_error: "Date of registration is required",
-  }),
-
-
-  // Uploads
-  part1PassingEmail: z.any().optional(),
-  medicalLicense: z.any(),
-  passportBioPage: z.any(),
-  signature: z.any(),
-
-
-  agreementDate: z.date({
-    required_error: "Date is required",
-  }),
-  termsAgreed: z.boolean().refine((val) => val === true, {
-    message: "You must agree to the terms and conditions",
-  }),
-});
 const formSchema = z.object({
   candidateId: z
     .string()
@@ -207,7 +153,6 @@ const formSchema = z.object({
 });
 
 type FormValues = z.infer<typeof formSchema>;
-type FormValuesValid = z.infer<typeof formSchemavalid>;
 
 // Part 1 exam dates
 const part1ExamDates = [
@@ -305,7 +250,6 @@ export function ApplicationForm() {
       registrationNumber: "",
       termsAgreed: false,
     },
-    
   });
   // PDF Document Component with multi-page support
 
@@ -313,94 +257,121 @@ export function ApplicationForm() {
     <View style={styles.watermarkContainer} fixed>
       <Text style={styles.watermarkText}>Preview</Text>
     </View>
-  )
-  
+  );
+
   const ApplicationPDFCompletePreview = ({ data, images }: any) => {
     return (
       <Document>
         {/* Main application form page */}
         <Page size="A4" style={styles.page}>
           {/* Watermark */}
-  
+
           <View style={styles.watermarkContainer} fixed>
-      <Text style={styles.watermarkText}>Preview</Text>
-    </View>
-  
+            <Text style={styles.watermarkText}>Preview</Text>
+          </View>
+
           {/* Header */}
           <View style={styles.header}>
             <View style={styles.headerContent1}>
               <Image src="/icon.png" style={styles.passportImage1} />
               <div className="text-center">
                 <Text style={styles.title}>MRCGP [INT.] South Asia</Text>
-                <Text style={styles.subtitle}>Part 2 (OSCE) Examination Application</Text>
+                <Text style={styles.subtitle}>
+                  Part 2 (OSCE) Examination Application
+                </Text>
               </div>
             </View>
-            {images.passport && <Image src={images.passport || "/placeholder.svg"} style={styles.passportImage} />}
+            {images.passport && (
+              <Image
+                src={images.passport || "/placeholder.svg"}
+                style={styles.passportImage}
+              />
+            )}
           </View>
-  
+
           {/* Main content - Resume style format */}
           <View style={styles.section}>
             {/* Candidate information section */}
             <View style={styles.resumeSection}>
               <View style={styles.resumeHeader}>
-                <Text style={styles.resumeSectionTitle}>CANDIDATE INFORMATION</Text>
+                <Text style={styles.resumeSectionTitle}>
+                  CANDIDATE INFORMATION
+                </Text>
               </View>
               <View style={styles.resumeBody}>
                 <View style={styles.row}>
                   <View style={styles.column}>
                     <View style={styles.fieldRow}>
                       <Text style={styles.fieldLabel}>Candidate ID:</Text>
-                      <Text style={styles.fieldValue}>{data.candidateId || "Not provided"}</Text>
+                      <Text style={styles.fieldValue}>
+                        {data.candidateId || "Not provided"}
+                      </Text>
                     </View>
                     <View style={styles.fieldRow}>
                       <Text style={styles.fieldLabel}>Full Name:</Text>
-                      <Text style={styles.fieldValue}>{data.fullName || "Not provided"}</Text>
+                      <Text style={styles.fieldValue}>
+                        {data.fullName || "Not provided"}
+                      </Text>
                     </View>
                   </View>
                 </View>
               </View>
             </View>
-  
+
             {/* Contact information section */}
             <View style={styles.resumeSection}>
               <View style={styles.resumeHeader}>
-                <Text style={styles.resumeSectionTitle}>CONTACT INFORMATION</Text>
+                <Text style={styles.resumeSectionTitle}>
+                  CONTACT INFORMATION
+                </Text>
               </View>
               <View style={styles.resumeBody}>
                 <View style={styles.row}>
                   <View style={styles.column}>
                     <View style={styles.fieldRow}>
                       <Text style={styles.fieldLabel}>WhatsApp:</Text>
-                      <Text style={styles.fieldValue}>{data.whatsapp || "Not provided"}</Text>
+                      <Text style={styles.fieldValue}>
+                        {data.whatsapp || "Not provided"}
+                      </Text>
                     </View>
                     <View style={styles.fieldRow}>
                       <Text style={styles.fieldLabel}>Emergency Contact:</Text>
-                      <Text style={styles.fieldValue}>{data.emergencyContact || "Not provided"}</Text>
+                      <Text style={styles.fieldValue}>
+                        {data.emergencyContact || "Not provided"}
+                      </Text>
                     </View>
                     <View style={styles.fieldRow}>
                       <Text style={styles.fieldLabel}>Email:</Text>
-                      <Text style={styles.fieldValue}>{data.email || "Not provided"}</Text>
+                      <Text style={styles.fieldValue}>
+                        {data.email || "Not provided"}
+                      </Text>
                     </View>
                   </View>
                 </View>
               </View>
             </View>
-  
+
             {/* Address section */}
             <View style={styles.resumeSection}>
               <View style={styles.resumeHeader}>
-                <Text style={styles.resumeSectionTitle}>CONTACT INFORMATION</Text>
+                <Text style={styles.resumeSectionTitle}>
+                  CONTACT INFORMATION
+                </Text>
               </View>
               <View style={styles.resumeBody}>
                 <View style={styles.row}>
                   <View style={styles.column}>
                     <View style={styles.fieldRow}>
                       <Text style={styles.fieldLabel}>Post Box:</Text>
-                      <Text style={styles.fieldValue}>{data.poBox || "No address"}</Text>
+                      <Text style={styles.fieldValue}>
+                        {data.poBox || "No address"}
+                      </Text>
                     </View>
                     <View style={styles.fieldRow}>
                       <Text style={styles.fieldLabel}>District</Text>
-                      <Text style={styles.fieldValue}>{data.district || ""}</Text>
+                      <Text style={styles.fieldValue}>
+                        {data.district || ""}
+                      </Text>
                     </View>
                     <View style={styles.fieldRow}>
                       <Text style={styles.fieldLabel}>City:</Text>
@@ -408,17 +379,21 @@ export function ApplicationForm() {
                     </View>
                     <View style={styles.fieldRow}>
                       <Text style={styles.fieldLabel}>province:</Text>
-                      <Text style={styles.fieldValue}>{data.province || ""}</Text>
+                      <Text style={styles.fieldValue}>
+                        {data.province || ""}
+                      </Text>
                     </View>
                     <View style={styles.fieldRow}>
                       <Text style={styles.fieldLabel}>Country:</Text>
-                      <Text style={styles.fieldValue}>{data.country || ""}</Text>
+                      <Text style={styles.fieldValue}>
+                        {data.country || ""}
+                      </Text>
                     </View>
                   </View>
                 </View>
               </View>
             </View>
-  
+
             {/* Experience section */}
             <View style={styles.resumeSection}>
               <View style={styles.resumeHeader}>
@@ -427,23 +402,31 @@ export function ApplicationForm() {
               <View style={styles.resumeBody}>
                 <View style={styles.fieldRow}>
                   <Text style={styles.fieldLabel}>Date of passing Part 1:</Text>
-                  <Text style={styles.fieldValue}>{data.dateOfPassingPart1 || "Not provided"}</Text>
+                  <Text style={styles.fieldValue}>
+                    {data.dateOfPassingPart1 || "Not provided"}
+                  </Text>
                 </View>
                 <View style={styles.fieldRow}>
                   <Text style={styles.fieldLabel}>Previous OSCE attempts:</Text>
-                  <Text style={styles.fieldValue}>{data.previousOsceAttempts || "Not provided"}</Text>
+                  <Text style={styles.fieldValue}>
+                    {data.previousOsceAttempts || "Not provided"}
+                  </Text>
                 </View>
                 <View style={styles.fieldRow}>
                   <Text style={styles.fieldLabel}>Country of experience:</Text>
-                  <Text style={styles.fieldValue}>{data.countryOfExperience || "Not provided"}</Text>
+                  <Text style={styles.fieldValue}>
+                    {data.countryOfExperience || "Not provided"}
+                  </Text>
                 </View>
                 <View style={styles.fieldRow}>
                   <Text style={styles.fieldLabel}>Country of origin:</Text>
-                  <Text style={styles.fieldValue}>{data.countryOfOrigin || "Not provided"}</Text>
+                  <Text style={styles.fieldValue}>
+                    {data.countryOfOrigin || "Not provided"}
+                  </Text>
                 </View>
               </View>
             </View>
-  
+
             {/* License details section */}
             <View style={styles.resumeSection}>
               <View style={styles.resumeHeader}>
@@ -452,25 +435,33 @@ export function ApplicationForm() {
               <View style={styles.resumeBody}>
                 <View style={styles.fieldRow}>
                   <Text style={styles.fieldLabel}>Registration authority:</Text>
-                  <Text style={styles.fieldValue}>{data.registrationAuthority || "Not provided"}</Text>
+                  <Text style={styles.fieldValue}>
+                    {data.registrationAuthority || "Not provided"}
+                  </Text>
                 </View>
                 <View style={styles.fieldRow}>
                   <Text style={styles.fieldLabel}>Registration number:</Text>
-                  <Text style={styles.fieldValue}>{data.registrationNumber || "Not provided"}</Text>
+                  <Text style={styles.fieldValue}>
+                    {data.registrationNumber || "Not provided"}
+                  </Text>
                 </View>
                 <View style={styles.fieldRow}>
                   <Text style={styles.fieldLabel}>Date of registration:</Text>
                   <Text style={styles.fieldValue}>
-                    {data.dateOfRegistration ? format(data.dateOfRegistration, "PPP") : "Not provided"}
+                    {data.dateOfRegistration
+                      ? format(data.dateOfRegistration, "PPP")
+                      : "Not provided"}
                   </Text>
                 </View>
               </View>
             </View>
-  
+
             {/* OSCE Session Preferences */}
             <View style={styles.resumeSection}>
               <View style={styles.resumeHeader}>
-                <Text style={styles.resumeSectionTitle}>OSCE SESSION PREFERENCES</Text>
+                <Text style={styles.resumeSectionTitle}>
+                  OSCE SESSION PREFERENCES
+                </Text>
               </View>
               <View style={styles.resumeBody}>
                 <View style={styles.fieldRow}>
@@ -499,7 +490,7 @@ export function ApplicationForm() {
                 </View>
               </View>
             </View>
-  
+
             {/* Agreement */}
             <View style={styles.resumeSection}>
               <View style={styles.resumeHeader}>
@@ -508,17 +499,23 @@ export function ApplicationForm() {
               <View style={styles.resumeBody}>
                 <View style={styles.fieldRow}>
                   <Text style={styles.fieldLabel}>Name:</Text>
-                  <Text style={styles.fieldValue}>{data.agreementName || "Not provided"}</Text>
+                  <Text style={styles.fieldValue}>
+                    {data.agreementName || "Not provided"}
+                  </Text>
                 </View>
                 <View style={styles.fieldRow}>
                   <Text style={styles.fieldLabel}>Date:</Text>
                   <Text style={styles.fieldValue}>
-                    {data.agreementDate ? format(data.agreementDate, "PPP") : "Not provided"}
+                    {data.agreementDate
+                      ? format(data.agreementDate, "PPP")
+                      : "Not provided"}
                   </Text>
                 </View>
                 <View style={styles.fieldRow}>
                   <Text style={styles.fieldLabel}>Terms Agreed:</Text>
-                  <Text style={styles.fieldValue}>{data.termsAgreed ? "Yes" : "No"}</Text>
+                  <Text style={styles.fieldValue}>
+                    {data.termsAgreed ? "Yes" : "No"}
+                  </Text>
                 </View>
               </View>
             </View>
@@ -529,42 +526,62 @@ export function ApplicationForm() {
               <View style={styles.resumeBody}>
                 <View style={styles.fieldRow}>
                   <Text style={styles.note}>
-                    THE NUMBER OF PLACES IS LIMITED, AND SLOTS WILL BE ALLOCATED ON THE "FIRST COME FIRST SERVED" BASIS.
-                    Your application may be rejected because of a large number of applicants and you may be invited to
-                    apply again or offered a slot at a subsequent examination. Priority will be given to applicants from
-                    South Asia and those applications that reach us first, so we encourage you to apply as soon as
-                    possible. WHILST WE WILL TRY TO ACCOMMODATE YOUR PREFERENCE, IT MAY NOT BE POSSIBLE DUE TO A LARGE
-                    NUMBER OF APPLICANTS. Please email us well in advance if you require a letter of invitation for visa
-                    purposes and make sure you complete all travel formalities in good time (visa applications, travel
-                    permits, leaves, etc.) No Refunds will be granted in case any candidate fails to get the visa prior to
-                    the exam date. Candidates with a disability are requested to read the rules and regulation document
-                    [Page 10] available on the website The MRCGP [INT.] South Asia Secretariat will notify you by email of
-                    your allocated date and time at least two weeks before the exam starting date.
+                    THE NUMBER OF PLACES IS LIMITED, AND SLOTS WILL BE ALLOCATED
+                    ON THE "FIRST COME FIRST SERVED" BASIS. Your application may
+                    be rejected because of a large number of applicants and you
+                    may be invited to apply again or offered a slot at a
+                    subsequent examination. Priority will be given to applicants
+                    from South Asia and those applications that reach us first,
+                    so we encourage you to apply as soon as possible. WHILST WE
+                    WILL TRY TO ACCOMMODATE YOUR PREFERENCE, IT MAY NOT BE
+                    POSSIBLE DUE TO A LARGE NUMBER OF APPLICANTS. Please email
+                    us well in advance if you require a letter of invitation for
+                    visa purposes and make sure you complete all travel
+                    formalities in good time (visa applications, travel permits,
+                    leaves, etc.) No Refunds will be granted in case any
+                    candidate fails to get the visa prior to the exam date.
+                    Candidates with a disability are requested to read the rules
+                    and regulation document [Page 10] available on the website
+                    The MRCGP [INT.] South Asia Secretariat will notify you by
+                    email of your allocated date and time at least two weeks
+                    before the exam starting date.
                   </Text>
                 </View>
               </View>
             </View>
             <View style={styles.resumeSection}>
               <View style={styles.resumeHeader}>
-                <Text style={styles.resumeSectionTitle}>CANDIDATE'S STATEMENT</Text>
+                <Text style={styles.resumeSectionTitle}>
+                  CANDIDATE'S STATEMENT
+                </Text>
               </View>
               <View style={styles.resumeBody}>
                 <View style={styles.fieldRow}>
                   <Text style={styles.note}>
-                    I hereby apply to sit the South Asia MRCGP [INT.] Part 2 (OSCE) Examination, success in which will
-                    allow me to apply for International Membership of the UK's Royal College of General Practitioners.
-                    Detailed information on the membership application process can be found on the RCGP website: Member
-                    Ship I have read and agree to abide by the conditions set out in the South Asia MRCGP [INT.]
-                    Examination Rules and Regulations as published on the MRCGP [INT.] South Asia website:
-                    www.mrcgpintsouthasia.org If accepted for International Membership, I undertake to continue approved
-                    postgraduate study while I remain in active general practice/family practice, and to uphold and
-                    promote the aims of the RCGP to the best of my ability. I understand that, on being accepted for
-                    International Membership, an annual subscription fee is to be payable to the RCGP. I understand that
-                    only registered International Members who maintain their RCGP subscription are entitled to use the
-                    post-nominal designation "MRCGP [INT]". Success in the exam does not give me the right to refer to
-                    myself as MRCGP [INT.]. I attach a banker's draft made payable to "MRCGP [INT.] South Asia", I also
-                    understand and agree that my personal data will be handled by the MRCGP [INT.] South Asia Board and I
-                    also give permission for my personal data to be handled by the regional MRCGP [INT.] South Asia
+                    I hereby apply to sit the South Asia MRCGP [INT.] Part 2
+                    (OSCE) Examination, success in which will allow me to apply
+                    for International Membership of the UK's Royal College of
+                    General Practitioners. Detailed information on the
+                    membership application process can be found on the RCGP
+                    website: Member Ship I have read and agree to abide by the
+                    conditions set out in the South Asia MRCGP [INT.]
+                    Examination Rules and Regulations as published on the MRCGP
+                    [INT.] South Asia website: www.mrcgpintsouthasia.org If
+                    accepted for International Membership, I undertake to
+                    continue approved postgraduate study while I remain in
+                    active general practice/family practice, and to uphold and
+                    promote the aims of the RCGP to the best of my ability. I
+                    understand that, on being accepted for International
+                    Membership, an annual subscription fee is to be payable to
+                    the RCGP. I understand that only registered International
+                    Members who maintain their RCGP subscription are entitled to
+                    use the post-nominal designation "MRCGP [INT]". Success in
+                    the exam does not give me the right to refer to myself as
+                    MRCGP [INT.]. I attach a banker's draft made payable to
+                    "MRCGP [INT.] South Asia", I also understand and agree that
+                    my personal data will be handled by the MRCGP [INT.] South
+                    Asia Board and I also give permission for my personal data
+                    to be handled by the regional MRCGP [INT.] South Asia
                     co-ordinators..
                   </Text>
                 </View>
@@ -572,16 +589,19 @@ export function ApplicationForm() {
             </View>
           </View>
         </Page>
-  
+
         {/* Each document on its own page */}
         {images.medicalLicense && (
           <Page size="A4" style={styles.page}>
             {/* Watermark */}
             <Watermark />
-  
+
             <View style={styles.documentPage}>
               <Text style={styles.documentPageTitle}>Medical License</Text>
-              <Image src={images.medicalLicense || "/placeholder.svg"} style={styles.documentPageImagePrev} />
+              <Image
+                src={images.medicalLicense || "/placeholder.svg"}
+                style={styles.documentPageImagePrev}
+              />
               <View style={styles.documentPageFooter}>
                 <Text style={styles.documentPageFooterText}>
                   {data.fullName} - Candidate ID: {data.candidateId}
@@ -590,15 +610,18 @@ export function ApplicationForm() {
             </View>
           </Page>
         )}
-  
+
         {images.part1Email && (
           <Page size="A4" style={styles.page}>
             {/* Watermark */}
             <Watermark />
-  
+
             <View style={styles.documentPage}>
               <Text style={styles.documentPageTitle}>Part 1 Passing Email</Text>
-              <Image src={images.part1Email || "/placeholder.svg"} style={styles.documentPageImagePrev} />
+              <Image
+                src={images.part1Email || "/placeholder.svg"}
+                style={styles.documentPageImagePrev}
+              />
               <View style={styles.documentPageFooter}>
                 <Text style={styles.documentPageFooterText}>
                   {data.fullName} - Candidate ID: {data.candidateId}
@@ -607,15 +630,18 @@ export function ApplicationForm() {
             </View>
           </Page>
         )}
-  
+
         {images.passportBio && (
           <Page size="A4" style={styles.page}>
             {/* Watermark */}
             <Watermark />
-  
+
             <View style={styles.documentPage}>
               <Text style={styles.documentPageTitle}>Passport Bio Page</Text>
-              <Image src={images.passportBio || "/placeholder.svg"} style={styles.documentPageImagePrev} />
+              <Image
+                src={images.passportBio || "/placeholder.svg"}
+                style={styles.documentPageImagePrev}
+              />
               <View style={styles.documentPageFooter}>
                 <Text style={styles.documentPageFooterText}>
                   {data.fullName} - Candidate ID: {data.candidateId}
@@ -624,15 +650,18 @@ export function ApplicationForm() {
             </View>
           </Page>
         )}
-  
+
         {images.signature && (
           <Page size="A4" style={styles.page}>
             {/* Watermark */}
             <Watermark />
-  
+
             <View style={styles.documentPage}>
               <Text style={styles.documentPageTitle}>Signature</Text>
-              <Image src={images.signature || "/placeholder.svg"} style={styles.documentPageImagePrev} />
+              <Image
+                src={images.signature || "/placeholder.svg"}
+                style={styles.documentPageImagePrev}
+              />
               <View style={styles.documentPageFooter}>
                 <Text style={styles.documentPageFooterText}>
                   {data.fullName} - Candidate ID: {data.candidateId}
@@ -642,8 +671,8 @@ export function ApplicationForm() {
           </Page>
         )}
       </Document>
-    )
-  }
+    );
+  };
   const ApplicationPDFComplete = ({ data, images }: any) => {
     return (
       <Document>
@@ -1058,7 +1087,7 @@ export function ApplicationForm() {
       right: 0,
       bottom: 0,
       zIndex: 9999,
-      
+
       pointerEvents: "none",
       display: "flex",
       justifyContent: "center",
@@ -1280,46 +1309,49 @@ export function ApplicationForm() {
   async function onSubmit(data: FormValues) {
     // Validate all fields
     Object.keys(form.getValues()).forEach((key) => {
-      form.trigger(key as keyof FormValuesValid)
-    })
+      form.trigger(key as keyof FormValues);
+    });
 
     // Validate phone numbers
-    const phoneRegex = /^\+?[1-9]\d{1,14}$/
+    const phoneRegex = /^\+?[1-9]\d{1,14}$/;
 
     if (!data.whatsapp || data.whatsapp.length < 8) {
       form.setError("whatsapp", {
         type: "manual",
         message: "Please enter a valid phone number",
-      })
-      setIsSubmitting(false)
-      return
+      });
+      setIsSubmitting(false);
+      return;
     }
 
     if (!phoneRegex.test(data.emergencyContact)) {
       form.setError("emergencyContact", {
         type: "manual",
         message: "Please enter a valid phone number",
-      })
-      setIsSubmitting(false)
-      return
+      });
+      setIsSubmitting(false);
+      return;
     }
 
     if (!params.examId || !selectedExam) {
-      alert("Exam ID is missing or invalid. Please try again.")
-      setIsSubmitting(false)
-      return
+      alert("Exam ID is missing or invalid. Please try again.");
+      setIsSubmitting(false);
+      return;
     }
 
-    if (signaturePreview === null || medicalLicensePreview === null || passportBioPreview === null) {
-      setWarning(true)
-      return
+    if (
+      signaturePreview === null ||
+      medicalLicensePreview === null ||
+      passportBioPreview === null
+    ) {
+      setWarning(true);
+      return;
     } else {
-      setWarning(false)
+      setWarning(false);
     }
 
     // Show confirmation dialog with custom styling
     const result = await Swal.fire({
-      
       html: `
       <div style="text-align: center; margin-bottom: 20px;">
       <img src="/icon.png" alt="MRCGP Logo" style="width: 100px; height: 100px; margin: 0 auto 15px auto;">
@@ -1344,18 +1376,20 @@ export function ApplicationForm() {
         confirmButton: "custom-swal-confirm",
         cancelButton: "custom-swal-cancel",
       },
-    })
+    });
 
     if (!result.isConfirmed) {
-      return
+      return;
     }
 
-    setIsSubmitting(true)
+    setIsSubmitting(true);
 
-    const isPendingAvailable = selectedExam.receivingApplicationsCount < selectedExam.applicationsLimit
+    const isPendingAvailable =
+      selectedExam.receivingApplicationsCount < selectedExam.applicationsLimit;
 
     const isWaitingAvailable =
-      selectedExam.receivingApplicationsCount < selectedExam.applicationsLimit + selectedExam.waitingLimit
+      selectedExam.receivingApplicationsCount <
+      selectedExam.applicationsLimit + selectedExam.waitingLimit;
 
     const application = {
       ...data,
@@ -1373,16 +1407,18 @@ export function ApplicationForm() {
       pdfUrl: "",
       date: new Date().toISOString(),
       name: data.fullName,
-      dateOfRegistration: data.dateOfRegistration ? data.dateOfRegistration.toISOString() : "",
+      dateOfRegistration: data.dateOfRegistration
+        ? data.dateOfRegistration.toISOString()
+        : "",
       preferenceDate1: data.preferenceDate1 || "",
       preferenceDate2: data.preferenceDate2 || "",
       preferenceDate3: data.preferenceDate3 || "",
-    }
+    };
 
     if (isPendingAvailable) {
-      application.status = "pending"
-      dispatch(addApplication(application))
-      dispatch(incrementApplicationsCount(params.examId))
+      application.status = "pending";
+      dispatch(addApplication(application));
+      dispatch(incrementApplicationsCount(params.examId));
 
       // Show success dialog with custom styling
       Swal.fire({
@@ -1411,22 +1447,24 @@ export function ApplicationForm() {
         },
         didOpen: () => {
           // Add event listener to the PDF preview link
-          document.getElementById("pdf-preview-link")?.addEventListener("click", (e) => {
-            e.preventDefault()
-            document.getElementById("pdf-download-link")?.click()
-          })
+          document
+            .getElementById("pdf-preview-link")
+            ?.addEventListener("click", (e) => {
+              e.preventDefault();
+              document.getElementById("pdf-download-link")?.click();
+            });
         },
       }).then((result) => {
         if (result.isConfirmed) {
           setTimeout(() => {
-            window.location.reload()
-          }, 2000)
+            window.location.reload();
+          }, 2000);
         }
-      })
+      });
     } else if (isWaitingAvailable) {
-      application.status = "waiting"
-      dispatch(addApplication(application))
-      dispatch(incrementApplicationsCount(params.examId))
+      application.status = "waiting";
+      dispatch(addApplication(application));
+      dispatch(incrementApplicationsCount(params.examId));
 
       // Show success dialog with custom styling
       Swal.fire({
@@ -1457,29 +1495,31 @@ export function ApplicationForm() {
         },
         didOpen: () => {
           // Add event listener to the PDF preview link
-          document.getElementById("pdf-preview-link")?.addEventListener("click", (e) => {
-            e.preventDefault()
-            document.getElementById("pdf-download-link")?.click()
-          })
+          document
+            .getElementById("pdf-preview-link")
+            ?.addEventListener("click", (e) => {
+              e.preventDefault();
+              document.getElementById("pdf-download-link")?.click();
+            });
         },
       }).then((result) => {
         if (result.isConfirmed) {
           setTimeout(() => {
-            window.location.reload()
-          }, 2000)
+            window.location.reload();
+          }, 2000);
         }
-      })
+      });
     } else {
-      dispatch(toggleBlockExam(params.examId))
+      dispatch(toggleBlockExam(params.examId));
       Swal.fire({
         title: "Error",
         text: "No more slots available for this exam.",
         icon: "error",
         confirmButtonColor: "#6366f1",
-      })
+      });
     }
 
-    setIsSubmitting(false)
+    setIsSubmitting(false);
   }
 
   const validateFile = async (file: File, inputId: string) => {
@@ -1663,15 +1703,13 @@ export function ApplicationForm() {
 
   function test() {
     setTimeout(() => {
-      const pdfBlob =
-        document.getElementById("pdf-download-preview-link");
+      const pdfBlob = document.getElementById("pdf-download-preview-link");
       if (pdfBlob) {
         // @ts-ignore
         const pdfUrl = pdfBlob.href;
         window.open(pdfUrl, "_blank");
       }
     }, 200);
-    
   }
 
   if (isExamClosed) {
@@ -2977,10 +3015,7 @@ export function ApplicationForm() {
                             name="agreementName"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>
-                                  Full name:{" "}
-                              
-                                </FormLabel>
+                                <FormLabel>Full name: </FormLabel>
                                 <FormControl>
                                   <Input
                                     placeholder="Enter Full name"
@@ -3106,7 +3141,6 @@ export function ApplicationForm() {
                   variant="outline"
                   onClick={() => {
                     form.handleSubmit(test)();
-                   
                   }}
                   className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
                 >
