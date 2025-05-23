@@ -4,25 +4,19 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { format } from "date-fns";
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
-import { FileText, Edit, Calendar, MapPin, Users, Clock } from "lucide-react";
+import { FileText, Edit, Calendar, MapPin, Users, Clock, File } from "lucide-react";
 import { DatePickerWithRange } from "@/components/ui/date-range-picker";
 import { cn } from "@/lib/utils";
 import {
-  addExam,
-  selectExams,
   toggleBlockExam,
-  updateExam,
 } from "@/redux/examDataSlice";
-import { useDispatch, useSelector } from "react-redux";
-
-
+import { useDispatch } from "react-redux";
 
 interface DateRange {
   from: Date | undefined;
@@ -133,32 +127,32 @@ export function Exam() {
 
   const [exams, setExams] = useState([]);
 
-  useEffect(() => {
-    const fetchExams = async () => {
-      try {
-        const token = localStorage.getItem("token");
+  const fetchExams = async () => {
+    try {
+      const token = localStorage.getItem("token");
 
-        const res = await fetch("http://localhost:3000/api/exams", {
-          headers: {
-            "Content-Type": "application/json",
-            ...(token && { Authorization: `Bearer ${token}` }),
-          },
-        });
+      const res = await fetch("http://localhost:3000/api/exams", {
+        headers: {
+          "Content-Type": "application/json",
+          ...(token && { Authorization: `Bearer ${token}` }),
+        },
+      });
 
-        if (!res.ok) {
-          const errorData = await res.json();
-          console.error("❌ Error fetching exams:", errorData);
-          return;
-        }
-
-        const data = await res.json();
-        console.log("✅ Exams fetched:", data.docs);
-        setExams(data.docs); // 👈 exams state update ho rahi hai
-      } catch (error) {
-        console.error("❌ Network error while fetching exams:", error);
+      if (!res.ok) {
+        const errorData = await res.json();
+        console.error("❌ Error fetching exams:", errorData);
+        return;
       }
-    };
 
+      const data = await res.json();
+      console.log("✅ Exams fetched:", data.docs);
+      setExams(data.docs); // 👈 exams state update ho rahi hai
+    } catch (error) {
+      console.error("❌ Network error while fetching exams:", error);
+    }
+  };
+
+  useEffect(() => {
     fetchExams();
   }, [editMode]);
 
@@ -185,53 +179,6 @@ export function Exam() {
   };
   console.log(editId, "editId");
 
-  // const onSubmit = (data: FormValues) => {
-  //   if (editMode && editId !== null) {
-  //     // Update existing exam
-  //     const examToUpdate = exams.find((exam) => exam.id === editId)
-  //     if (examToUpdate) {
-  //       dispatch(
-  //         updateExam({
-  //           ...examToUpdate,
-  //           name: data.name,
-  //           location: data.location,
-  //           openingDate: data.applicationsDateRange.from,
-  //           closingDate: data.applicationsDateRange.to,
-  //           slot1: `${data.slot1DateRange.from} | ${data.slot1DateRange.to}`,
-  //           slot2: data.slot2DateRange.from ? `${data.slot2DateRange.from} | ${data.slot2DateRange.to}` : "",
-  //           slot3: data.slot3DateRange.from ? `${data.slot3DateRange.from} | ${data.slot3DateRange.to}` : "",
-  //           applicationsLimit: Number.parseInt(data.applicationsLimit) || 0,
-  //           waitingLimit: Number.parseInt(data.waitingLimit) || 0,
-  //         }),
-  //       )
-  //       setEditMode(false)
-  //       setEditId(null)
-  //     }
-  //   } else {
-  //     // Add new exam
-  //     const ID = crypto.randomUUID()
-  //     const newExamData: ExamData = {
-  //       id: ID,
-  //       name: data.name,
-  //       location: data.location,
-  //       openingDate: data.applicationsDateRange.from,
-  //       closingDate: data.applicationsDateRange.to,
-  //       slot1: `${data.slot1DateRange.from} | ${data.slot1DateRange.to}`,
-  //       slot2: data.slot2DateRange.from ? `${data.slot2DateRange.from} | ${data.slot2DateRange.to}` : "",
-  //       slot3: data.slot3DateRange.from ? `${data.slot3DateRange.from} | ${data.slot3DateRange.to}` : "",
-  //       applicationsLimit: Number.parseInt(data.applicationsLimit) || 0,
-  //       waitingLimit: Number.parseInt(data.waitingLimit) || 0,
-  //       formLink: `${window.location.origin}/application/${ID}`,
-  //       isBlocked: false,
-  //       receivingApplicationsCount: 0,
-  //     }
-
-  //     dispatch(addExam(newExamData))
-  //   }
-
-  //   // Reset form
-  //   form.reset(defaultFormState)
-  // }
   const onSubmit = async (data: any) => {
     const newExamData = {
       name: data.name,
@@ -299,14 +246,44 @@ export function Exam() {
       form.reset(defaultFormState);
       setEditMode(false);
       setEditId(null);
+      fetchExams();
     } catch (error) {
       console.error("❌ Error submitting exam:", error);
     }
   };
 
-  const toggleBlock = (id: string) => {
-    dispatch(toggleBlockExam(id));
-  };
+  const toggleBlock = async (id: string, currentValue: boolean) => {
+  try {
+    const token = localStorage.getItem("token");
+
+    const res = await fetch(`http://localhost:3000/api/exams/${id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        ...(token && { Authorization: `Bearer ${token}` }),
+      },
+      body: JSON.stringify({
+        isBlocked: !currentValue, // Toggle value
+      }),
+    });
+
+    if (!res.ok) {
+      const error = await res.json();
+      console.error("❌ Error updating isBlocked:", error);
+      return;
+    }
+
+    const updated = await res.json();
+    console.log("✅ isBlocked updated:", updated);
+    // Optionally update state here
+    fetchExams();
+    dispatch(toggleBlockExam(id)); // redux update if needed
+
+  } catch (error) {
+    console.error("❌ Network error while updating isBlocked:", error);
+  }
+};
+
 
   const handleEdit = (exam: any) => {
     // Parse slot dates
@@ -558,7 +535,7 @@ export function Exam() {
           <div className="p-4">
             <div className="grid grid-cols-1 w-auto md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
               {[...exams].map((exam: any) => (
-                <div className="exam-card relative overflow-hidden rounded-xl p-5 transition-all duration-300 hover:shadow-xl dark:shadow-slate-900/30 hover:translate-y-[-5px] border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 flex flex-col min-h-[280px]">
+                <div key={exam.id} className="exam-card relative overflow-hidden rounded-xl p-5 transition-all duration-300 hover:shadow-xl dark:shadow-slate-900/30 hover:translate-y-[-5px] border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 flex flex-col min-h-[280px]">
                   <div className="absolute top-0 right-0 p-2">
                     <div className="flex items-center space-x-2">
                       <span className="text-xs dark:text-slate-400">
@@ -566,7 +543,7 @@ export function Exam() {
                       </span>
                       <Switch
                         checked={exam.isBlocked}
-                        onCheckedChange={() => toggleBlock(exam.id)}
+                        onCheckedChange={() => toggleBlock(exam.id, exam.isBlocked)}
                         className="data-[state=checked]:bg-slate-700"
                       />
                     </div>
@@ -574,7 +551,7 @@ export function Exam() {
 
                   <div className="mb-4 flex items-center">
                     <div className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center mr-3">
-                      <Calendar className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+                      <File className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
                     </div>
                     <h3 className="font-bold text-lg dark:text-white">
                       {exam.name}
