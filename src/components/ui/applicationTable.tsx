@@ -36,13 +36,12 @@ import {
 import { Calendar, Download, Filter, Loader2, Search } from "lucide-react";
 import { DataTable } from "../data-table";
 import { useEffect, useState } from "react";
-import { selectExams } from "@/redux/examDataSlice";
-import { useDispatch, useSelector } from "react-redux";
-import { selectApplications, setApplicationStatus } from "@/redux/applicationsSlice";
 import { ApplicationData, columns } from "../columns";
 import { format } from "date-fns";
 import { pdf } from "@react-pdf/renderer";
 import Swal from "sweetalert2";
+import { updateApplicationStatus } from "@/hooks/applicationUpdate";
+
 
 export default function ApplicationTable() {
 
@@ -50,11 +49,73 @@ export default function ApplicationTable() {
       const [selectedExam, setSelectedExam] = useState<string>("all");
       const [filteredData, setFilteredData] = useState<ApplicationData[]>();
       const [isExporting, setIsExporting] = useState(false);
-      const initialExams = useSelector(selectExams);
       const [pdfGenerating] = useState(false);
-      const dispatch = useDispatch();
       const [searchQuery, setSearchQuery] = useState<string>("");
-      const applications = useSelector(selectApplications);
+        const [applications, setApplications] = useState<ApplicationData[]>([]);
+  const [loading, setLoading] = useState(true);
+console.log(applications,"applications");
+
+
+const [initialExams, setInitialExams] = useState<any>([]);
+
+  const fetchExams = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const res = await fetch("http://localhost:3000/api/exams", {
+        headers: {
+          "Content-Type": "application/json",
+          ...(token && { Authorization: `Bearer ${token}` }),
+        },
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        console.error("❌ Error fetching exams:", errorData);
+        return;
+      }
+
+      const data = await res.json();
+      console.log("✅ Exams fetched:", data.docs);
+      setInitialExams(data.docs); // 👈 exams state update ho rahi hai
+    } catch (error) {
+      console.error("❌ Network error while fetching exams:", error);
+    }
+  };
+  const fetchApplications = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const res = await fetch('http://localhost:3000/api/applications', {
+          headers: {
+            'Content-Type': 'application/json',
+            ...(token && { Authorization: `Bearer ${token}` }),
+          },
+        });
+
+        if (!res.ok) {
+          const errorData = await res.json();
+          console.error('❌ Error fetching applications:', errorData);
+          return;
+        }
+
+        const data = await res.json();
+        console.log('✅ Applications fetched:', data.docs);
+        setApplications(data.docs);
+      } catch (error) {
+        console.error('❌ Network error:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+  useEffect(() => {
+    fetchExams();
+  }, []);
+
+  useEffect(() => {
+    fetchApplications();
+  }, []);
+
 
     const actionColumn = {
         id: "actions",
@@ -100,90 +161,84 @@ export default function ApplicationTable() {
         },
       };
 
-      const handleStatusChange = async (id: string, status: "approved" | "rejected") => {
-        if (status === "approved") {
-          // Show approval confirmation dialog
-          const result = await Swal.fire({
-            title: "Are you sure you want to approve?",
-            imageUrl: "/icon.png", // Replace with your actual icon path
-            imageWidth: 150,
-            imageHeight: 150,
-            showCancelButton: true,
-            confirmButtonText: "Yes, please approve",
-            cancelButtonText: "Cancel",
-            confirmButtonColor: "#4ade80",
-            cancelButtonColor: "#ef4444",
-            customClass: {
-              popup: "rounded-lg",
-              confirmButton: "rounded-lg px-4 py-2",
-              cancelButton: "rounded-lg px-4 py-2",
-            },
-          })
-    
-          if (result.isConfirmed) {
-            // Call the status change handler
-            dispatch(setApplicationStatus({ id, status }));
-    
-            // Show success message
-            await Swal.fire({
-              title: "Updated Successfully!",
-              imageUrl: "/icon.png", // Replace with your actual icon path
-              imageWidth: 150,
-              imageHeight: 150,
-              confirmButtonText: "OK",
-              confirmButtonColor: "#3b82f6",
-              customClass: {
-                popup: "rounded-lg",
-                confirmButton: "rounded-lg px-4 py-2",
-              },
-            })
-          }
-        } else if (status === "rejected") {
-          // Show rejection confirmation dialog with reason input
-          const result = await Swal.fire({
-            title: "Are you sure you want to reject?",
-            imageUrl: "/icon.png", // Replace with your actual logo path
-            imageWidth: 150,
-            imageHeight: 150,
-            input: "text",
-            inputPlaceholder: "Enter reason...",
-            showCancelButton: true,
-            confirmButtonText: "Yes, please reject!",
-            cancelButtonText: "Cancel",
-            confirmButtonColor: "#4ade80",
-            cancelButtonColor: "#ef4444",
-            customClass: {
-              popup: "rounded-lg",
-              input: "border rounded-lg p-2 w-auto",
-              confirmButton: "rounded-lg px-4 py-2",
-              cancelButton: "rounded-lg px-4 py-2",
-            },
-          })
-    
-          if (result.isConfirmed) {
-            dispatch(setApplicationStatus({ id, status }));
-          }
-        }
-      }
-    
-      // const handleStatusChange = (
-      //   id: string,
-      //   newStatus: "approved" | "rejected"
-      // ) => {
-      //   dispatch(setApplicationStatus({ id, status: newStatus }));
-      // };
-    
+ 
+
+const handleStatusChange = async (id: string, status: "approved" | "rejected") => {
+  if (status === "approved") {
+    const result = await Swal.fire({
+      title: "Are you sure you want to approve?",
+      imageUrl: "/icon.png",
+      imageWidth: 150,
+      imageHeight: 150,
+      showCancelButton: true,
+      confirmButtonText: "Yes, please approve",
+      cancelButtonText: "Cancel",
+      confirmButtonColor: "#4ade80",
+      cancelButtonColor: "#ef4444",
+      customClass: {
+        popup: "rounded-lg",
+        confirmButton: "rounded-lg px-4 py-2",
+        cancelButton: "rounded-lg px-4 py-2",
+      },
+    });
+
+    if (result.isConfirmed) {
+      await updateApplicationStatus({ id, status });
+
+      await Swal.fire({
+        title: "Updated Successfully!",
+        imageUrl: "/icon.png",
+        imageWidth: 150,
+        imageHeight: 150,
+        confirmButtonText: "OK",
+        confirmButtonColor: "#3b82f6",
+        customClass: {
+          popup: "rounded-lg",
+          confirmButton: "rounded-lg px-4 py-2",
+        },
+      });
+    }
+  } else if (status === "rejected") {
+    const result = await Swal.fire({
+      title: "Are you sure you want to reject?",
+      imageUrl: "/icon.png",
+      imageWidth: 150,
+      imageHeight: 150,
+      input: "text",
+      inputPlaceholder: "Enter reason...",
+      showCancelButton: true,
+      confirmButtonText: "Yes, please reject!",
+      cancelButtonText: "Cancel",
+      confirmButtonColor: "#4ade80",
+      cancelButtonColor: "#ef4444",
+      customClass: {
+        popup: "rounded-lg",
+        input: "border rounded-lg p-2 w-auto",
+        confirmButton: "rounded-lg px-4 py-2",
+        cancelButton: "rounded-lg px-4 py-2",
+      },
+    });
+
+    if (result.isConfirmed) {
+      const reason = result.value;
+      await updateApplicationStatus({ id, status, reason });
+    }
+  }
+  fetchApplications();
+};
+
+
       const handleExamChange = (value: string) => {
         setSelectedExam(value);
       };
     
       const handlePdfGenerate = async (row: any) => {
         const blob = await generatePdfBlob(row.original, {
-          passport: row.original.passportUrl,
-          medicalLicense: row.original.medicalLicenseUrl,
-          part1Email: row.original.part1EmailUrl,
-          passportBio: row.original.passportBioUrl,
-          signature: row.original.signatureUrl,
+          passport: row.original.passportUrl.url,
+          medicalLicense: row.original.medicalLicenseUrl.url,
+          part1Email: row.original.part1EmailUrl.url,
+          passportBio: row.original.passportBioUrl.url,
+          signature: row.original.signatureUrl.url,
         });
         const url = URL.createObjectURL(blob);
         window.open(url, "_blank");
@@ -255,7 +310,7 @@ export default function ApplicationTable() {
     
             const examName =
               selectedExam !== "all"
-                ? initialExams.find((exam) => exam.id.toString() === selectedExam)
+                ? initialExams.find((exam: any) => exam.id.toString() === selectedExam)
                     ?.name || "Selected-Exam"
                 : "All-Exams";
     
@@ -275,6 +330,7 @@ export default function ApplicationTable() {
           }
         }, 500);
       };
+    console.log(selectedExam,"selected exam");
 
       const generatePdfBlob = async (data: any, images: any) => {
         const doc = <ApplicationPDF data={data} images={images} />;
@@ -849,7 +905,7 @@ export default function ApplicationTable() {
     // Then filter by exam
     if (selectedExam !== "all") {
       statusFiltered = statusFiltered.filter(
-        (app: any) => app.examId === selectedExam
+        (app: any) => app.examId.id === selectedExam
       );
     }
 
@@ -867,6 +923,9 @@ export default function ApplicationTable() {
 
     setFilteredData(statusFiltered);
   }, [activeFilter, selectedExam, applications, searchQuery]);
+
+  if (loading) return <p>Loading applications...</p>;
+
 
   return (
     <div>
@@ -1016,7 +1075,7 @@ export default function ApplicationTable() {
                               >
                                 All Exams
                               </SelectItem>
-                              {initialExams.map((exam) => (
+                              {initialExams.map((exam: any) => (
                                 <SelectItem
                                   key={exam.id}
                                   value={exam.id.toString()}
@@ -1051,7 +1110,7 @@ export default function ApplicationTable() {
                             Showing applications for:{" "}
                             <span className="text-indigo-600 dark:text-indigo-400">
                               {applications.find(
-                                (exam) => exam.examId === selectedExam
+                                (exam: any) => exam.examId.id === selectedExam
                               )?.examName || "N/A"}
                             </span>
                           </span>

@@ -102,7 +102,7 @@ export const columns: ColumnDef<ApplicationData>[] = [
                   : "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400 border-blue-200 dark:border-blue-800"
           }
         >
-          {status.charAt(0).toUpperCase() + status.slice(1)}
+          {status?.charAt(0).toUpperCase() + status?.slice(1)}
         </Badge>
       )
     },
