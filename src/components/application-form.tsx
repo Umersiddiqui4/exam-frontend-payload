@@ -68,14 +68,14 @@ import {
 import { PhoneInput } from "./ui/phone-input";
 import "react-phone-number-input/style.css";
 import { useParams } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import {
-  incrementApplicationsCount,
-  selectExams,
+  // incrementApplicationsCount,
+  // selectExams,
   toggleBlockExam,
 } from "@/redux/examDataSlice";
-import { supabase } from "@/lib/supabaseClient";
-import { addApplication } from "@/redux/applicationsSlice";
+// import { supabase } from "@/lib/supabaseClient";
+// import { addApplication } from "@/redux/applicationsSlice";
 import {
   PDFDownloadLink,
   Document,
@@ -223,7 +223,7 @@ export function ApplicationForm() {
   const [availableDates, setAvailableDates] = useState<Date[]>([]);
   const [isExamClosed, setIsExamClosed] = useState(false);
   const [isClosed, setIsClosed] = useState(false);
-  const [warning, setWarning] = useState(false);
+  const [warning ] = useState(false);
   const [exams, setExams] = useState<any>([]);
   const [selectedDates, setSelectedDates] = useState<{
     preferenceDate1: string | null;
