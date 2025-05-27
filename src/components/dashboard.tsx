@@ -19,9 +19,9 @@ import { useMobile } from "../hooks/use-mobile";
 import { Tabs, TabsContent } from "../components/ui/tabs";
 
 import { useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { logout } from "@/redux/Slice";
-import { selectApplications } from "@/redux/applicationsSlice";
+import { ApplicationData } from "./columns";
 
 export function Dashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -30,8 +30,37 @@ export function Dashboard() {
   const navigate = useNavigate();
   const isMobile = useMobile();
   const [open, setOpen] = useState(false);
-  const dispatch = useDispatch();
-  const applications = useSelector(selectApplications);
+  const [applications, setApplications] = useState<ApplicationData[]>([]);
+const dispatch = useDispatch();
+  const fetchApplications = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const res = await fetch('http://localhost:3000/api/applications', {
+          headers: {
+            'Content-Type': 'application/json',
+            ...(token && { Authorization: `Bearer ${token}` }),
+          },
+        });
+
+        if (!res.ok) {
+          const errorData = await res.json();
+          console.error('❌ Error fetching applications:', errorData);
+          return;
+        }
+
+        const data = await res.json();
+        console.log('✅ Applications fetched:', data.docs);
+        setApplications(data.docs);
+      } catch (error) {
+        console.error('❌ Network error:', error);
+      } finally {
+        // setLoading(false);
+      }
+    };
+
+  useEffect(() => {
+    fetchApplications();
+  }, []);
 
   const handleLogout = () => {
     dispatch(logout());

@@ -91,13 +91,14 @@ import ExamClosedApp from "./ui/examClosedApplication";
 import ExamClosed from "./ui/examClosed";
 import "../App.css";
 import { isValidPhoneNumber } from "libphonenumber-js";
+import useSubmitApplication from "@/hooks/useSubmitApplication";
 
 const formSchema = z.object({
   candidateId: z
     .string()
     .length(7, "Candidate ID must be exactly 7 numbers")
     .regex(/^\d+$/, "Candidate ID must contain only numbers"),
-  passportImage: z.any().optional(),
+  passportImage: z.any(),
   fullName: z.string().min(2, "Full name is required"),
 
   // Address
@@ -207,11 +208,23 @@ export function ApplicationForm() {
     null
   );
   const [signaturePreview, setSignaturePreview] = useState<string | null>(null);
+  const [passportData, setPassportData] = useState<string | null>(null);
+  const [medicalLicenseData, setMedicalLicenseData] = useState<
+    string | null
+  >(null);
+  const [part1EmailData, setPart1EmailData] = useState<string | null>(
+    null
+  );
+  const [passportBioData, setPassportBioData] = useState<string | null>(
+    null
+  );
+  const [signatureData, setSignatureData] = useState<string | null>(null);
   const [pdfGenerating] = useState(false);
   const [availableDates, setAvailableDates] = useState<Date[]>([]);
   const [isExamClosed, setIsExamClosed] = useState(false);
   const [isClosed, setIsClosed] = useState(false);
   const [warning, setWarning] = useState(false);
+  const [exams, setExams] = useState<any>([]);
   const [selectedDates, setSelectedDates] = useState<{
     preferenceDate1: string | null;
     preferenceDate2: string | null;
@@ -221,15 +234,45 @@ export function ApplicationForm() {
     preferenceDate2: null,
     preferenceDate3: null,
   });
-  const exams = useSelector(selectExams);
+
+  
+  const fetchExams = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      
+      const res = await fetch("http://localhost:3000/api/exams", {
+        headers: {
+          "Content-Type": "application/json",
+          ...(token && { Authorization: `Bearer ${token}` }),
+        },
+      });
+      
+      if (!res.ok) {
+        const errorData = await res.json();
+        console.error("❌ Error fetching exams:", errorData);
+        return;
+      }
+      
+      const data = await res.json();
+      setExams(data.docs); // 👈 exams state update ho rahi hai
+    } catch (error) {
+      console.error("❌ Network error while fetching exams:", error);
+    }
+  };
+  
+  useEffect(() => {
+    fetchExams();
+  }, []);
+  
   const params = useParams();
   const dispatch = useDispatch();
-
+  
   if (!params.examId) return null;
+  
+const formLinkToMatch = `http://localhost:5173/application/${params.examId}`;
 
-  const selectedExam = exams.find((exam) => exam.id === params.examId);
-  if (selectedExam === undefined) return <NotFound />;
-
+const selectedExam = exams.find((exam: any) => exam.formLink === formLinkToMatch);
+  
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -1275,7 +1318,7 @@ export function ApplicationForm() {
       color: "#6b7280",
     },
   });
-
+  
   // Prepare images for PDF
   const pdfImages = useMemo(() => {
     return {
@@ -1292,7 +1335,7 @@ export function ApplicationForm() {
     passportBioPreview,
     signaturePreview,
   ]);
-
+  
   useEffect(() => {
     if (selectedExam && new Date(selectedExam.closingDate) < new Date()) {
       setIsExamClosed(true);
@@ -1305,16 +1348,18 @@ export function ApplicationForm() {
       setIsClosed(false);
     }
   }, [selectedExam]);
+ const { mutateAsync } = useSubmitApplication();
 
+  
   async function onSubmit(data: FormValues) {
     // Validate all fields
     Object.keys(form.getValues()).forEach((key) => {
       form.trigger(key as keyof FormValues);
     });
-
+    
     // Validate phone numbers
     const phoneRegex = /^\+?[1-9]\d{1,14}$/;
-
+    
     if (!data.whatsapp || data.whatsapp.length < 8) {
       form.setError("whatsapp", {
         type: "manual",
@@ -1323,7 +1368,7 @@ export function ApplicationForm() {
       setIsSubmitting(false);
       return;
     }
-
+    
     if (!phoneRegex.test(data.emergencyContact)) {
       form.setError("emergencyContact", {
         type: "manual",
@@ -1339,16 +1384,16 @@ export function ApplicationForm() {
       return;
     }
 
-    if (
-      signaturePreview === null ||
-      medicalLicensePreview === null ||
-      passportBioPreview === null
-    ) {
-      setWarning(true);
-      return;
-    } else {
-      setWarning(false);
-    }
+    // if (
+    //   signaturePreview === null ||
+    //   medicalLicensePreview === null ||
+    //   passportBioPreview === null
+    // ) {
+    //   setWarning(true);
+    //   return;
+    // } else {
+    //   setWarning(false);
+    // }
 
     // Show confirmation dialog with custom styling
     const result = await Swal.fire({
@@ -1391,20 +1436,21 @@ export function ApplicationForm() {
       selectedExam.receivingApplicationsCount <
       selectedExam.applicationsLimit + selectedExam.waitingLimit;
 
-    const application = {
+    const application: any = {
       ...data,
-      examId: params.examId,
+      // examId: params.examId,
+      examId: selectedExam,
       examName: selectedExam.name,
       id: crypto.randomUUID(),
       applicantName: data.fullName,
       submittedDate: new Date().toISOString(),
-      passportUrl: passportPreview || "",
-      medicalLicenseUrl: medicalLicensePreview || "",
-      part1EmailUrl: part1EmailPreview || "",
-      passportBioUrl: passportBioPreview || "",
-      signatureUrl: signaturePreview || "",
+      passportUrl: passportData || "",
+      medicalLicenseUrl: medicalLicenseData || "",
+      part1EmailUrl: part1EmailData || "",
+      passportBioUrl: passportBioData || "",
+      signatureUrl: signatureData || "",
       status: "",
-      pdfUrl: "",
+      pdfUrl: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
       date: new Date().toISOString(),
       name: data.fullName,
       dateOfRegistration: data.dateOfRegistration
@@ -1417,9 +1463,23 @@ export function ApplicationForm() {
 
     if (isPendingAvailable) {
       application.status = "pending";
-      dispatch(addApplication(application));
-      dispatch(incrementApplicationsCount(params.examId));
+const cleanedApp = { ...application };
 
+const nullableKeys: (keyof typeof cleanedApp)[] = [
+  "passportUrl",
+  "medicalLicenseUrl",
+  "part1EmailUrl",
+  "passportBioUrl",
+  "signatureUrl",
+];
+
+nullableKeys.forEach((key) => {
+  if (!cleanedApp[key]) delete cleanedApp[key];
+});
+try {
+  await mutateAsync(cleanedApp);
+} catch (err) {
+  console.error("❌ Submission failed:", err);
       // Show success dialog with custom styling
       Swal.fire({
         html: `
@@ -1461,10 +1521,10 @@ export function ApplicationForm() {
           }, 2000);
         }
       });
+      }
     } else if (isWaitingAvailable) {
       application.status = "waiting";
-      dispatch(addApplication(application));
-      dispatch(incrementApplicationsCount(params.examId));
+await mutateAsync(application); 
 
       // Show success dialog with custom styling
       Swal.fire({
@@ -1522,81 +1582,86 @@ export function ApplicationForm() {
     setIsSubmitting(false);
   }
 
-  const validateFile = async (file: File, inputId: string) => {
-    // List of input IDs that require validation
-    const validateThese = ["passport-image"];
+ const validateFile = async (file: File, inputId: string) => {
+  const validateThese = ["passport-image"];
+  setFileError(null);
 
-    // Reset error
-    setFileError(null);
-
-    // Only validate if inputId is in the validation list
-    if (validateThese.includes(inputId)) {
-      // Check file type
-      const validTypes = ["image/jpeg", "image/jpg", "image/png"];
-      if (!validTypes.includes(file.type)) {
-        setFileError(
-          `Invalid file format. Only PNG and JPG formats are supported.`
-        );
-        const fileInput = document.getElementById(inputId) as HTMLInputElement;
-        if (fileInput) fileInput.value = "";
-        return false;
-      }
-
-      // Check file size (2MB = 2 * 1024 * 1024 bytes)
-      const maxSize = 2 * 1024 * 1024;
-      if (file.size > maxSize) {
-        setFileError(
-          `File size exceeds 2MB limit. Please choose a smaller file.`
-        );
-        const fileInput = document.getElementById(inputId) as HTMLInputElement;
-        if (fileInput) fileInput.value = "";
-        return false;
-      }
+  if (validateThese.includes(inputId)) {
+    const validTypes = ["image/jpeg", "image/jpg", "image/png"];
+    if (!validTypes.includes(file.type)) {
+      setFileError("Invalid file format. Only PNG and JPG formats are supported.");
+      const fileInput = document.getElementById(inputId) as HTMLInputElement;
+      if (fileInput) fileInput.value = "";
+      return false;
     }
 
-    // Upload to Supabase
-    const fileName = `${inputId}/${Date.now()}_${file.name}`;
-    const { error } = await supabase.storage
-      .from("restaurant-images")
-      .upload(fileName, file);
+    const maxSize = 2 * 1024 * 1024;
+    if (file.size > maxSize) {
+      setFileError("File size exceeds 2MB limit. Please choose a smaller file.");
+      const fileInput = document.getElementById(inputId) as HTMLInputElement;
+      if (fileInput) fileInput.value = "";
+      return false;
+    }
+  }
 
-    if (error) {
+  // ✅ Upload to Payload CMS
+  const formData = new FormData();
+  formData.append("file", file); // important: must be 'file'
+
+  try {
+    const res = await fetch("http://localhost:3000/api/media", {
+      method: "POST",
+      body: formData,
+    });
+
+    if (!res.ok) {
       setFileError("Upload failed. Please try again.");
       return false;
     }
 
-    // Get public URL
-    const { data: publicUrlData } = supabase.storage
-      .from("restaurant-images")
-      .getPublicUrl(fileName);
-    const publicUrl = publicUrlData?.publicUrl;
+    const data = await res.json();
+
+    // ✅ Get uploaded file URL
+    const publicUrl = data?.doc; // or data.filename if you store just file name
+
 
     if (!publicUrl) {
       setFileError("Could not retrieve image URL.");
       return false;
     }
 
-    // Set image URL in preview state
+    // ✅ Set preview based on input ID
     switch (inputId) {
       case "passport-image":
-        setPassportPreview(publicUrl);
+        setPassportPreview(publicUrl.url);
+        setPassportData(publicUrl.id);
         break;
       case "medical-license":
-        setMedicalLicensePreview(publicUrl);
+        setMedicalLicensePreview(publicUrl.url);
+        setMedicalLicenseData(publicUrl.id);
         break;
       case "part1-email":
-        setPart1EmailPreview(publicUrl);
+        setPart1EmailPreview(publicUrl.url);
+        setPart1EmailData(publicUrl.id);
         break;
       case "passport-bio":
-        setPassportBioPreview(publicUrl);
+        setPassportBioPreview(publicUrl.url);
+        setPassportBioData(publicUrl.id);
         break;
       case "signature":
-        setSignaturePreview(publicUrl);
+        setSignaturePreview(publicUrl.url);
+        setSignatureData(publicUrl.id);
         break;
     }
 
     return true;
-  };
+  } catch (error) {
+    console.error(error);
+    setFileError("Something went wrong.");
+    return false;
+  }
+};
+console.log(`File uploaded successfully: ${passportPreview}`);
 
   useEffect(() => {
     // Cleanup function to revoke object URLs when component unmounts
@@ -1718,6 +1783,7 @@ export function ApplicationForm() {
   if (isClosed) {
     return <ExamClosedApp />;
   }
+  if (selectedExam === undefined) return <NotFound />;
 
   return (
     <div className="container mx-auto py-8 px-4 max-w-5xl">
@@ -3173,7 +3239,7 @@ export function ApplicationForm() {
                 ></Button>
                 <Button
                   type="submit"
-                  disabled={isSubmitting}
+                  // disabled={isSubmitting}
                   className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white transition-all duration-200 transform hover:scale-105"
                 >
                   {isSubmitting ? (
