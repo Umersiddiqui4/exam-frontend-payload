@@ -2,7 +2,7 @@
 import axios from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: "http://localhost:3000/api", // Replace with actual base URL
+  baseURL: "https://exam-cms-payload.vercel.app/api", // Replace with actual base URL
   headers: {
     "Content-Type": "application/json",
   },

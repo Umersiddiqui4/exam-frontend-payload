@@ -14,6 +14,6 @@ export const updateApplicationStatus = async ({
     ...(reason && { rejectionReason: reason }), // optional field
   };
 
-  const res = await axios.patch(`http://localhost:3000/api/applications/${id}`, payload);
+  const res = await axios.patch(`https://exam-cms-payload.vercel.app/api/applications/${id}`, payload);
   return res.data;
 };

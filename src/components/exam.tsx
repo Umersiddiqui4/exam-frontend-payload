@@ -131,7 +131,7 @@ export function Exam() {
     try {
       const token = localStorage.getItem("token");
 
-      const res = await fetch("http://localhost:3000/api/exams", {
+      const res = await fetch("https://exam-cms-payload.vercel.app/api/exams", {
         headers: {
           "Content-Type": "application/json",
           ...(token && { Authorization: `Bearer ${token}` }),
@@ -219,8 +219,8 @@ export function Exam() {
 
       const res = await fetch(
         editMode
-          ? `http://localhost:3000/api/exams/${editId}` // 🛠️ PATCH for edit
-          : `http://localhost:3000/api/exams`, // 🆕 POST for new
+          ? `https://exam-cms-payload.vercel.app/api/exams/${editId}` // 🛠️ PATCH for edit
+          : `https://exam-cms-payload.vercel.app/api/exams`, // 🆕 POST for new
         {
           method: editMode ? "PATCH" : "POST",
           headers: {
@@ -256,7 +256,7 @@ export function Exam() {
   try {
     const token = localStorage.getItem("token");
 
-    const res = await fetch(`http://localhost:3000/api/exams/${id}`, {
+    const res = await fetch(`https://exam-cms-payload.vercel.app/api/exams/${id}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",

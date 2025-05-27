@@ -5,7 +5,7 @@ const useSubmitApplication = () => {
   return useMutation({
     mutationFn: async (application) => {
       const response = await axios.post(
-        "http://localhost:3000/api/applications",
+        "https://exam-cms-payload.vercel.app/api/applications",
         application,
         {
           headers: {

@@ -35,7 +35,7 @@ const dispatch = useDispatch();
   const fetchApplications = async () => {
       try {
         const token = localStorage.getItem('token');
-        const res = await fetch('http://localhost:3000/api/applications', {
+        const res = await fetch('https://exam-cms-payload.vercel.app/api/applications', {
           headers: {
             'Content-Type': 'application/json',
             ...(token && { Authorization: `Bearer ${token}` }),

@@ -48,7 +48,7 @@ export function LoginForm() {
 //   const checkUserExists = async (emailToCheck: string) => {
 //   try {
 //     const res = await fetch(
-//       `http://localhost:3000/api/users?where[email][equals]=${emailToCheck}`,
+//       `https://exam-cms-payload.vercel.app/api/users?where[email][equals]=${emailToCheck}`,
 //       {
 //         method: 'GET',
 //         headers: {
@@ -97,7 +97,7 @@ const handleSubmit = async (e: React.FormEvent) => {
   dispatch({ type: 'auth/loginRequest' });
 
   try {
-    const res = await fetch('http://localhost:3000/api/users/login', {
+    const res = await fetch('https://exam-cms-payload.vercel.app/api/users/login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

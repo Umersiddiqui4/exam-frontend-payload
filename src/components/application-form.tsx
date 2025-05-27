@@ -240,7 +240,7 @@ export function ApplicationForm() {
     try {
       const token = localStorage.getItem("token");
       
-      const res = await fetch("http://localhost:3000/api/exams", {
+      const res = await fetch("https://exam-cms-payload.vercel.app/api/exams", {
         headers: {
           "Content-Type": "application/json",
           ...(token && { Authorization: `Bearer ${token}` }),
@@ -1609,7 +1609,7 @@ await mutateAsync(application);
   formData.append("file", file); // important: must be 'file'
 
   try {
-    const res = await fetch("http://localhost:3000/api/media", {
+    const res = await fetch("https://exam-cms-payload.vercel.app/api/media", {
       method: "POST",
       body: formData,
     });
