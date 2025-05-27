@@ -233,10 +233,12 @@ const handleStatusChange = async (id: string, status: "approved" | "rejected") =
       };
     
       const handlePdfGenerate = async (row: any) => {
+        console.log("Generating PDF for row:", row.original);
+        
         const blob = await generatePdfBlob(row.original, {
           passport: row.original.passportUrl.url,
           medicalLicense: row.original.medicalLicenseUrl.url,
-          part1Email: row.original.part1EmailUrl.url,
+          part1Email: row.original.part1EmailUrl?.url,
           passportBio: row.original.passportBioUrl.url,
           signature: row.original.signatureUrl.url,
         });
